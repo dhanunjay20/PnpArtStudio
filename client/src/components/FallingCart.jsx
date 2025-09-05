@@ -1,0 +1,193 @@
+// src/components/FallingCart.jsx
+import React, { useEffect, useRef } from "react";
+import { ShoppingCart } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./FallingCart.css";
+
+/**
+ * Auto-falling cart that:
+ * - Starts falling on mount and on every route change (location.pathname)
+ * - Slows proportionally while scrolling (modulates playbackRate)
+ * - Pauses with ripple on hover/focus
+ * - Navigates to /cart on click (configurable)
+ */
+const FallingCart = ({
+  right = 16,
+  bottomOffset = 88,
+  durationMs = 14000,      // total fall time
+  delayMs = 200,           // start delay per page
+  minRate = 0.15,          // slowest rate under scroll
+  easeBackMs = 400,        // ease back to 1 after scroll stops
+  scrollSensitivity = 0.004, // map scroll velocity to slowdown
+  size = 22,
+  navigateTo = "/cart",
+  ariaLabel = "Go to cart",
+  className = ""
+}) => {
+  const navigate = useNavigate();
+  const location = useLocation(); // restart on pathname change [2]
+  const hostRef = useRef(null);
+  const animRef = useRef(null);
+
+  // Scroll velocity tracking
+  const lastY = useRef(0);
+  const lastT = useRef(0);
+  const rafScroll = useRef(0);
+  const rafEase = useRef(0);
+  const stopTimer = useRef(0);
+
+  const startFall = () => {
+    const el = hostRef.current;
+    if (!el) return;
+
+    // Cancel any previous animation
+    if (animRef.current) {
+      try { animRef.current.cancel(); } catch {}
+      animRef.current = null;
+    }
+
+    // Reset transform to start above view for each page
+    const startY = -1.01 * Math.max(window.innerHeight, 1);
+    el.style.transform = `translateY(${startY}px)`;
+
+    // Create WAAPI animation (translateY: start -> 0)
+    const fall = el.animate(
+      [{ transform: `translateY(${startY}px)` }, { transform: "translateY(0px)" }],
+      {
+        duration: durationMs,
+        delay: delayMs,
+        easing: "cubic-bezier(.22,.61,.36,1)",
+        fill: "forwards",
+        iterations: 1,
+      }
+    );
+
+    fall.playbackRate = 1; // baseline forward speed [6]
+    animRef.current = fall;
+
+    // Initialize velocity baseline for this page
+    lastY.current = window.scrollY || 0;
+    lastT.current = performance.now();
+  };
+
+  // Start on mount and on every route change (pathname)
+  useEffect(() => {
+    startFall(); // re-create the animation per page [2]
+    return () => {
+      if (animRef.current) {
+        try { animRef.current.cancel(); } catch {}
+        animRef.current = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]); // only when path changes [1]
+
+  // Scroll-based slowdown: modulate playbackRate via rAF
+  useEffect(() => {
+    const easeBack = (startRate, startTime) => {
+      if (!animRef.current) return;
+      const now = performance.now();
+      const t = Math.min(1, (now - startTime) / easeBackMs);
+      const eased = startRate + (1 - startRate) * t;
+      animRef.current.updatePlaybackRate(eased); // synced speed change [11]
+      if (t < 1) {
+        rafEase.current = requestAnimationFrame(() => easeBack(startRate, startTime));
+      } else {
+        rafEase.current = 0;
+      }
+    };
+
+    const applyRate = (rate) => {
+      if (!animRef.current) return;
+      animRef.current.playbackRate = rate; // immediate response while scrolling [6]
+      if (rate === 1) return;
+      if (rafEase.current) cancelAnimationFrame(rafEase.current);
+      rafEase.current = requestAnimationFrame(() => easeBack(rate, performance.now()));
+    };
+
+    const onScroll = () => {
+      if (rafScroll.current) return;
+      rafScroll.current = requestAnimationFrame(() => {
+        rafScroll.current = 0;
+        if (!animRef.current) return;
+
+        const y = window.scrollY || 0;
+        const t = performance.now();
+        if (!lastT.current) {
+          lastY.current = y;
+          lastT.current = t;
+          return;
+        }
+        const dy = y - lastY.current;
+        const dt = Math.max(1, t - lastT.current);
+        lastY.current = y;
+        lastT.current = t;
+
+        const vel = Math.abs(dy) / dt; // px/ms
+        const slowdown = Math.min(0.9, vel / Math.max(0.00001, scrollSensitivity));
+        const rate = Math.max(minRate, 1 - slowdown); // clamp to minRate
+        applyRate(rate);
+
+        if (stopTimer.current) clearTimeout(stopTimer.current);
+        stopTimer.current = window.setTimeout(() => applyRate(1), 180);
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (rafScroll.current) cancelAnimationFrame(rafScroll.current);
+      if (rafEase.current) cancelAnimationFrame(rafEase.current);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (stopTimer.current) clearTimeout(stopTimer.current);
+    };
+  }, [easeBackMs, minRate, scrollSensitivity]);
+
+  // Hover to pause visually: set rate ≈ 0; resume to 1 on leave
+  useEffect(() => {
+    const el = hostRef.current;
+    if (!el) return;
+    const btn = el.querySelector(".fc-btn");
+    if (!btn) return;
+
+    const onEnter = () => {
+      if (animRef.current) animRef.current.playbackRate = 0; // pause effect [6]
+    };
+    const onLeave = () => {
+      if (animRef.current) animRef.current.updatePlaybackRate(1); // smooth resume [11]
+    };
+
+    btn.addEventListener("mouseenter", onEnter);
+    btn.addEventListener("focus", onEnter);
+    btn.addEventListener("mouseleave", onLeave);
+    btn.addEventListener("blur", onLeave);
+
+    return () => {
+      btn.removeEventListener("mouseenter", onEnter);
+      btn.removeEventListener("focus", onEnter);
+      btn.removeEventListener("mouseleave", onLeave);
+      btn.removeEventListener("blur", onLeave);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={hostRef}
+      className={`falling-cart-auto ${className}`}
+      style={{ right: `${right}px`, bottom: `${bottomOffset}px` }}
+    >
+      <button
+        type="button"
+        className="fc-btn"
+        aria-label={ariaLabel}
+        onClick={() => navigate(navigateTo)}
+      >
+        <ShoppingCart size={size} />
+        <span className="ripples" aria-hidden="true" />
+      </button>
+    </div>
+  );
+};
+
+export default FallingCart;

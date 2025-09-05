@@ -1,0 +1,11 @@
+/* If using fixed-top navbar, offset page content */
+.pt-nav {
+  /* Adjust to your navbar height (56px default for Bootstrap’s .navbar) */
+  padding-top: 100px;
+}
+
+/* Optional: active nav styling */
+.nav-link.active {
+  color: #d63384 !important;
+  font-weight: 600;
+}

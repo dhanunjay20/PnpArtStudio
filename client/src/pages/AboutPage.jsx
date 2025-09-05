@@ -1,0 +1,295 @@
+// AboutPage.jsx — Bootstrap version (fixed overflow/right margin)
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Award, Palette, Users, Star, Heart } from 'lucide-react';
+import { Link } from "react-router-dom";
+
+const AboutPage = () => {
+  const milestones = [
+    { year: 2018, title: 'First Solo Exhibition', description: 'Launched my artistic journey with my first solo exhibition in downtown gallery' },
+    { year: 2019, title: 'Art Workshop Series', description: 'Started teaching art workshops to share knowledge and inspire others' },
+    { year: 2020, title: 'Digital Transformation', description: 'Adapted to digital platforms during pandemic, reaching global audience' },
+    { year: 2021, title: 'Award Recognition', description: "Received 'Emerging Artist of the Year' award from National Art Council" },
+    { year: 2022, title: 'Studio Expansion', description: 'Opened larger studio space to accommodate growing workshop demand' },
+    { year: 2024, title: 'Online Gallery Launch', description: 'Launched comprehensive online platform for art lovers worldwide' }
+  ];
+
+  const achievements = [
+    { icon: Award, number: '50+', label: 'Awards Won' },
+    { icon: Palette, number: '500+', label: 'Artworks Created' },
+    { icon: Users, number: '1000+', label: 'Students Taught' },
+    { icon: Heart, number: '5000+', label: 'Art Lovers Reached' }
+  ];
+
+  const pressFeatures = [
+    { publication: 'Art Today Magazine', title: 'Rising Stars in Contemporary Art', year: 2023, quote: 'A unique voice that bridges traditional techniques with modern expression' },
+    { publication: 'Creative Quarterly', title: 'Workshop Innovation in Art Education', year: 2022, quote: 'Transforming how art is taught and experienced by new generations' },
+    { publication: 'Gallery Times', title: 'Emerging Artists to Watch', year: 2021, quote: 'Exceptional talent with a gift for capturing emotion through color' }
+  ];
+
+  return (
+    <div className="min-vh-100 about-root" style={{ background: 'linear-gradient(135deg,#fff1f2,#fff7ed)' }}>
+      {/* Local, page-scoped CSS to prevent horizontal overflow */}
+      <style>{`
+        .about-root { overflow-x: clip; }
+        @supports not (overflow: clip) { .about-root { overflow-x: hidden; } }
+
+        /* Ensure media never causes layout shifts */
+        .about-hero-img { display:block; width:100%; height:600px; object-fit:cover; }
+
+        /* Keep timeline visuals inside the container box */
+        .timeline-wrap { position: relative; overflow: clip; }
+        @supports not (overflow: clip) { .timeline-wrap { overflow: hidden; } }
+
+        /* Optional: if you draw a center line/dots, keep them centered without overflow */
+        .timeline-line {
+          position:absolute; top:0; bottom:0; left:50%; width:2px;
+          transform:translateX(-1px);
+          background: linear-gradient(180deg,#ffd1dc,#ffe3c2);
+        }
+        .timeline-dot {
+          position:absolute; left:50%; transform:translate(-50%, -50%);
+          width:12px; height:12px; border-radius:50%;
+          background: linear-gradient(90deg,#d63384,#fd7e14);
+          box-shadow: 0 0 0 3px rgba(255,255,255,.9);
+        }
+
+        /* Keep the floating rating card inside the image bounds on all screens */
+        .rating-card {
+          left: 16px; bottom: 16px; transform: none; /* was left:-24; bottom:-24; translateY(-50%) */
+        }
+
+        /* Bootstrap rows already manage gutters; no negative margins outside .container */
+      `}</style>
+
+      {/* Hero */}
+      <section className="py-5">
+        <div className="container">
+          <div className="row g-4 align-items-center">
+            {/* Text */}
+            <div className="col-12 col-lg-6">
+              <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+                <h1 className="fw-bold display-5 mb-3">Meet the Artist</h1>
+                <div className="lead text-muted mb-4">
+                  <p className="mb-3">
+                    Welcome to my world of colors, emotions, and creativity. I’m a passionate artist dedicated to bringing beauty and inspiration into people’s lives through original paintings and handcrafted artworks.
+                  </p>
+                  <p className="mb-3">
+                    My journey began over a decade ago, exploring infinite possibilities—from traditional oil paintings to contemporary mixed media pieces.
+                  </p>
+                  <p className="mb-0">
+                    Every brushstroke tells a story, every color carries emotion, and each piece is crafted with love and dedication to create something truly unique.
+                  </p>
+                </div>
+
+                <div className="d-flex flex-wrap gap-2">
+                  <span className="badge bg-white text-danger border shadow-sm px-3 py-2">🎨 Traditional Techniques</span>
+                  <span className="badge bg-white text-warning border shadow-sm px-3 py-2">✨ Modern Innovation</span>
+                  <span className="badge bg-white text-warning border shadow-sm px-3 py-2">💝 Custom Creations</span>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Image + rating card */}
+            <div className="col-12 col-lg-6 position-relative">
+              <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+                <div className="rounded-4 overflow-hidden shadow-lg position-relative">
+                  <img
+                    src="https://images.pexels.com/photos/1183992/pexels-photo-1183992.jpeg?auto=compress&cs=tinysrgb&w=600&h=800&fit=crop"
+                    alt="Artist at work"
+                    className="about-hero-img"
+                  />
+                  <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,.35), transparent)' }} />
+                </div>
+
+                {/* Keep inside the image (no negative offsets) */}
+                <div className="position-absolute rating-card">
+                  <div className="bg-white p-3 rounded-4 shadow">
+                    <div className="d-flex align-items-center gap-1 text-warning mb-1">
+                      <Star size={18} fill="currentColor" />
+                      <Star size={18} fill="currentColor" />
+                      <Star size={18} fill="currentColor" />
+                      <Star size={18} fill="currentColor" />
+                      <Star size={18} fill="currentColor" />
+                    </div>
+                    <div className="text-muted small">4.9/5 Customer Rating</div>
+                    <div className="fw-semibold">1000+ Happy Customers</div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission & Vision */}
+      <section className="py-5 bg-white">
+        <div className="container">
+          <div className="row g-4">
+            <div className="col-12 col-md-6">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="rounded-4 p-4 p-lg-5"
+                style={{ background: 'linear-gradient(135deg,#ffe4e6,#ffedd5)' }}
+              >
+                <div className="rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 64, height: 64, background: '#d63384' }}>
+                  <Heart size={28} className="text-white" />
+                </div>
+                <h3 className="fw-bold mb-3">Our Mission</h3>
+                <p className="mb-0">
+                  To create meaningful connections between art and people—bringing joy, inspiration, and beauty into every home through original, handcrafted artworks that tell stories and evoke emotions.
+                </p>
+              </motion.div>
+            </div>
+
+            <div className="col-12 col-md-6">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="rounded-4 p-4 p-lg-5"
+                style={{ background: 'linear-gradient(135deg,#ffedd5,#fef3c7)' }}
+              >
+                <div className="rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 64, height: 64, background: '#fd7e14' }}>
+                  <Palette size={28} className="text-white" />
+                </div>
+                <h3 className="fw-bold mb-3">Our Vision</h3>
+                <p className="mb-0">
+                  To become a global platform where art enthusiasts discover unique, authentic pieces while supporting independent artists and fostering a vibrant creative community.
+                </p>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Timeline */}
+      <section className="py-5">
+        <div className="container">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold display-6 mb-2">My Artistic Journey</h2>
+            <p className="lead text-muted mb-0">Key milestones that shaped my career</p>
+          </motion.div>
+
+          <div className="position-relative timeline-wrap">
+            <div className="timeline-line" />
+            <div className="vstack gap-4">
+              {milestones.map((m, i) => {
+                const left = i % 2 === 0;
+                return (
+                  <motion.div
+                    key={`${m.year}-${m.title}`}
+                    initial={{ opacity: 0, x: left ? -30 : 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: i * 0.1 }}
+                    className="position-relative"
+                  >
+                    <div className="row align-items-stretch">
+                      <div className={`col-12 col-lg-6 ${left ? '' : 'order-lg-2'}`}>
+                        <div className={`h-100 p-4 rounded-4 shadow-sm bg-white ${left ? 'me-lg-4 text-lg-end' : 'ms-lg-4 text-lg-start'}`}>
+                          <div className="fw-bold" style={{ color: '#d63384', fontSize: 24 }}>{m.year}</div>
+                          <h3 className="h5 fw-semibold mb-2">{m.title}</h3>
+                          <p className="mb-0 text-muted">{m.description}</p>
+                        </div>
+                      </div>
+                      <div className={`col-12 col-lg-6 ${left ? 'order-lg-2' : ''}`} />
+                    </div>
+                    {/* Optional dot; if using, position it with top relative to the block */}
+                    {/* <div className="timeline-dot" style={{ top: '50%' }} /> */}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Achievements */}
+      <section className="py-5 bg-white">
+        <div className="container">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold mb-2">Achievements &amp; Impact</h2>
+            <p className="lead text-muted mb-0">Numbers that reflect the journey</p>
+          </motion.div>
+
+          <div className="row row-cols-2 row-cols-md-4 g-4">
+            {achievements.map((a, i) => (
+              <motion.div
+                key={a.label}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="col text-center"
+              >
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                  style={{ width: 80, height: 80, background: 'linear-gradient(135deg,#ffe4e6,#ffedd5)' }}
+                >
+                  <a.icon size={40} style={{ color: '#d63384' }} />
+                </div>
+                <div className="fw-bold" style={{ fontSize: 28 }}>{a.number}</div>
+                <div className="text-muted fw-medium">{a.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Press */}
+      <section className="py-5" style={{ background: '#f8f9fa' }}>
+        <div className="container">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold mb-2">Press &amp; Recognition</h2>
+            <p className="lead text-muted mb-0">Featured in leading art publications</p>
+          </motion.div>
+
+          <div className="row g-4">
+            {pressFeatures.map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="col-12 col-md-6 col-lg-4"
+              >
+                <div className="card h-100 border-0 rounded-4 shadow-sm p-4">
+                  <div className="text-danger fw-bold mb-1">{f.publication}</div>
+                  <h3 className="h5 fw-semibold mb-1">{f.title}</h3>
+                  <div className="text-muted small mb-3">{f.year}</div>
+                  <blockquote className="mb-0 fst-italic">“{f.quote}”</blockquote>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-5" style={{ background: 'linear-gradient(90deg,#d63384,#fd7e14)' }}>
+        <div className="container text-center text-white">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <h2 className="fw-bold mb-2">Ready to Start Your Art Collection?</h2>
+            <p className="lead text-white-50 mb-4">Explore the gallery or commission a custom piece that speaks to your heart</p>
+            <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+              <Link to="/gallery" className="text-decoration-none"> {/* Browse Gallery */}
+                <button className="btn btn-light text-danger fw-semibold rounded-pill px-4">
+                  Browse Gallery
+                </button>
+              </Link>
+                      
+              <Link to="/custom-order" className="text-decoration-none"> {/* Commission Custom Art */}
+                <button className="btn btn-outline-light fw-semibold rounded-pill px-4">
+                  Commission Custom Art
+                </button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default AboutPage;

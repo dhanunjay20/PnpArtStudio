@@ -1,0 +1,118 @@
+/* Main nav underline animation for standard links */
+.nav-link.nav-hover {
+  position: relative;
+  transition: color 160ms ease-in-out, opacity 160ms ease-in-out;
+}
+
+/* Animated underline using ::after for non-dropdown links */
+.nav-link.nav-hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.25rem; /* align visually under the text */
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, #d63384, #fd7e14);
+  transition: width 200ms ease;
+}
+
+/* Hover/focus shows underline */
+.nav-link.nav-hover:hover::after,
+.nav-link.nav-hover:focus::after {
+  width: 100%;
+}
+
+/* Active route keeps underline visible */
+.nav-link.nav-hover.active::after {
+  width: 100%;
+}
+
+/* Slight lift on active text */
+.nav-link.nav-hover.active {
+  color: #d63384 !important;
+  font-weight: 600;
+}
+
+/* SHOP dropdown toggle: Bootstrap caret uses ::after, so use ::before for underline */
+.nav-link.dropdown-toggle.nav-hover {
+  position: relative;
+}
+
+/* Underline for Shop via ::before to avoid caret conflict */
+.nav-link.dropdown-toggle.nav-hover::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.25rem;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, #d63384, #fd7e14);
+  transition: width 200ms ease;
+}
+
+/* Hover/focus for Shop underline */
+.nav-link.dropdown-toggle.nav-hover:hover::before,
+.nav-link.dropdown-toggle.nav-hover:focus::before {
+  width: 100%;
+}
+
+/* Active Shop keeps underline visible on /shop routes */
+.nav-link.dropdown-toggle.nav-hover.active::before {
+  width: 100%;
+}
+
+/* Dropdown items: smooth background on hover/active */
+.dropdown-item.nav-hover {
+  transition: background-color 150ms ease, color 150ms ease;
+  background-image: none;
+}
+
+.dropdown-item.nav-hover:hover,
+.dropdown-item.nav-hover:focus {
+  background-color: rgba(214, 51, 132, 0.08);
+  color: #111827;
+}
+
+.dropdown-item.nav-hover.active {
+  background-color: rgba(214, 51, 132, 0.15);
+  color: #111827;
+}
+
+/* Optional: soften dropdown menu entrance */
+.dropdown-menu {
+  transition: opacity 140ms ease, transform 140ms ease;
+  transform-origin: top center;
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Remove the down caret arrow only for the Shop toggle */
+#shopDropdown.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Submenu (dropend) open on hover for desktop/trackpad only */
+@media (hover: hover) and (pointer: fine) {
+  /* Ensure nested dropend is positioned to the right of parent */
+  .dropdown-menu li.dropend { position: relative; }
+  .dropdown-menu li.dropend > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -0.25rem;
+    border-radius: 0 0.25rem 0.25rem 0;
+    display: none; /* hidden until hovered */
+  }
+  /* Reveal submenu when parent li.dropend is hovered */
+  .dropdown-menu li.dropend:hover > .dropdown-menu {
+    display: block;
+  }
+  /* Visual cue for hovered parent item */
+  .dropdown-menu li.dropend:hover > .dropdown-toggle {
+    background-color: var(--bs-dropdown-link-hover-bg, rgba(0,0,0,.05));
+  }
+}

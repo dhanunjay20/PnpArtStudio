@@ -1,0 +1,64 @@
+/* Fixed host; transform driven by WAAPI initially and then held at rest */
+.falling-cart-auto {
+  position: fixed;
+  z-index: 1040;
+  /* right/bottom via style props */
+}
+
+/* Reduce motion: no falling */
+@media (prefers-reduced-motion: reduce) {
+  .falling-cart-auto { transform: none !important; }
+}
+
+/* Button (same as before) */
+.fc-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,.06);
+
+  color: #fff;
+  background: linear-gradient(90deg, #d63384, #fd7e14);
+  box-shadow: 0 8px 24px rgba(214, 51, 132, 0.28);
+  cursor: pointer;
+
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.fc-btn:hover,
+.fc-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(214, 51, 132, 0.34);
+  outline: none;
+}
+
+/* Ripple aura */
+.fc-btn .ripples {
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  pointer-events: none;
+  display: none;
+}
+.fc-btn:hover .ripples,
+.fc-btn:focus-visible .ripples { display: block; }
+
+.fc-btn .ripples::before,
+.fc-btn .ripples::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgba(214, 51, 132, 0.45);
+  animation: fc-ripple 1.6s ease-out infinite;
+}
+.fc-btn .ripples::after { animation-delay: .8s; }
+
+@keyframes fc-ripple {
+  0%   { transform: scale(1);   opacity: .5; }
+  100% { transform: scale(1.8); opacity: 0;  }
+}
