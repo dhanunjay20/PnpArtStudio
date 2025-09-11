@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import "./admin.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
-const CLASSES_URL = `${API_BASE}/api/classes`;
+const CLASSES_URL = `${API_BASE}/api/classes`; // must match server mount /api + /classes [1][2]
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -40,28 +40,23 @@ const mapClassFromApi = (doc) => ({
   cover: doc.cover || "",
   description: doc.description || "",
   published: !!doc.published
-});
+}); // aligns with backend JSON doc fields [1]
 
-// Unsigned Cloudinary upload for a single image (cover)
 async function uploadToCloudinary(file, folder = "pnpart/ecommerce/classes") {
   if (!CLOUD_NAME || !UPLOAD_PRESET) {
     throw new Error("Cloudinary env missing (VITE_CLOUDINARY_CLOUD_NAME, VITE_CLOUDINARY_UPLOAD_PRESET)");
-  }
+  } // preset must exist for unsigned uploads [3][4]
   const fd = new FormData();
   fd.append("file", file);
   fd.append("upload_preset", UPLOAD_PRESET);
   fd.append("folder", folder);
-
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-    method: "POST",
-    body: fd
-  });
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: fd });
   const data = await res.json();
   if (!res.ok || !data.secure_url) {
     throw new Error(data?.error?.message || "Cloudinary upload failed");
-  }
+  } // handle Cloudinary API response correctly [3]
   return { url: data.secure_url, publicId: data.public_id };
-}
+} // unsigned upload: file + upload_preset (+ folder if preset allows) [4]
 
 export default function ClassesPage() {
   const [items, setItems] = useState([]);
@@ -82,15 +77,14 @@ export default function ClassesPage() {
       setItems(list);
     } catch (e) {
       console.error(e);
-      toast.error("Failed to load classes");
+      toast.error(e?.response?.status === 404 ? "Route not found (/api/classes)" : "Failed to load classes");
     } finally {
       setLoading(false);
     }
-  };
+  }; // GET /api/classes -> { items } [1]
 
   useEffect(() => { load(); }, []);
 
-  // Cover file -> Cloudinary -> set form.cover
   const handleCoverFile = async (file) => {
     if (!file) {
       setCoverPreview(form.cover ? form.cover : "");
@@ -111,20 +105,19 @@ export default function ClassesPage() {
     } finally {
       setUploadingCover(false);
     }
-  };
+  }; // stores single cover URL as string to match backend schema [3]
 
   const resetForm = () => {
     setForm(EMPTY_CLASS);
     setEditingId("");
     setCoverPreview("");
     if (fileRef.current) fileRef.current.value = "";
-  };
+  }; // simple form reset on success [1]
 
   const saveClass = async (e) => {
     e?.preventDefault?.();
     if (!form.title.trim()) { toast.warning("Class title is required"); return; }
     if (!form.startDate) { toast.warning("Start date is required"); return; }
-
     try {
       const payload = {
         title: form.title,
@@ -137,13 +130,13 @@ export default function ClassesPage() {
         cover: form.cover,
         description: form.description || "",
         published: !!form.published
-      };
+      }; // JSON body matches backend router expectations [1]
 
       if (editingId) {
         const res = await axios.put(`${CLASSES_URL}/${editingId}`, payload, {
           withCredentials: true,
           headers: { "Content-Type": "application/json" }
-        });
+        }); // PUT /api/classes/:id [1]
         const updated = mapClassFromApi(res.data);
         setItems((arr) => arr.map((it) => (it.id === editingId ? updated : it)));
         toast.success("Class updated");
@@ -151,7 +144,7 @@ export default function ClassesPage() {
         const res = await axios.post(CLASSES_URL, payload, {
           withCredentials: true,
           headers: { "Content-Type": "application/json" }
-        });
+        }); // POST /api/classes [1]
         const created = mapClassFromApi(res.data);
         setItems((arr) => [created, ...arr]);
         toast.success("Class created");
@@ -159,9 +152,9 @@ export default function ClassesPage() {
       resetForm();
     } catch (e) {
       console.error(e);
-      toast.error("Failed to save class");
+      toast.error(e?.response?.status === 404 ? "Route not found (/api/classes)" : "Failed to save class");
     }
-  };
+  }; // uses same endpoint base for create/update to match server routes [1]
 
   const editClass = (id) => {
     const found = items.find((c) => c.id === id);
@@ -170,20 +163,20 @@ export default function ClassesPage() {
     setForm({ ...found });
     setCoverPreview(found.cover || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }; // local fill for editing without extra GET [1]
 
   const deleteClass = async (id) => {
     if (!window.confirm("Delete this class?")) return;
     try {
-      await axios.delete(`${CLASSES_URL}/${id}`, { withCredentials: true });
+      await axios.delete(`${CLASSES_URL}/${id}`, { withCredentials: true }); // DELETE /api/classes/:id [1]
       setItems((arr) => arr.filter((c) => c.id !== id));
       if (editingId === id) resetForm();
       toast.success("Class deleted");
     } catch (e) {
       console.error(e);
-      toast.error("Failed to delete class");
+      toast.error(e?.response?.status === 404 ? "Route not found (/api/classes/:id)" : "Failed to delete class");
     }
-  };
+  }; // consistent DELETE path bound to server router [1]
 
   return (
     <div>
@@ -373,7 +366,6 @@ export default function ClassesPage() {
 
       <div className="card border-0 shadow-sm rounded-4">
         <div className="card-body p-0">
-          {/* On small screens only, enable horizontal scroll; desktop unchanged */}
           <div className="table-responsive-sm">
             <table className="table align-middle mb-0">
               <thead className="table-light">

@@ -72,14 +72,13 @@ const AboutPage = () => {
                 <h1 className="fw-bold display-5 mb-3">Meet the Artist</h1>
                 <div className="lead text-muted mb-4">
                   <p className="mb-3">
-                    Welcome to my world of colors, emotions, and creativity. I’m a passionate artist dedicated to bringing beauty and inspiration into people’s lives through original paintings and handcrafted artworks.
+                    This is Priyanka Vasista, and art has been a part of my life since childhood. I was first inspired by my father, who painted as a hobby. Watching him work with colors sparked my imagination and ignited my lifelong passion for art.
                   </p>
                   <p className="mb-3">
-                    My journey began over a decade ago, exploring infinite possibilities—from traditional oil paintings to contemporary mixed media pieces.
+                    Over the years, that passion has grown into both a creative journey and a career. I have been teaching art for more than 10 years, guiding students of all ages to explore their creativity. Alongside teaching, I actively create and share my own artwork.
                   </p>
                   <p className="mb-0">
-                    Every brushstroke tells a story, every color carries emotion, and each piece is crafted with love and dedication to create something truly unique.
-                  </p>
+                    Art, for me, is not just an expression but also a way to bring joy and meaning to people’s lives whether it’s through a painting that decorates a home, a custom piece that carries special memories, or a creative class that inspires a child.                  </p>
                 </div>
 
                 <div className="d-flex flex-wrap gap-2">

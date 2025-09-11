@@ -3,19 +3,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight,
-  Star,
-  Users,
-  Award,
-  Palette,
-  Sparkles,
-  Paintbrush,
-  Gem,
-  Shield,
-  GraduationCap,   // NEW
-  Calendar         // NEW
+  ArrowRight, Star, Users, Award, Palette, Sparkles, Paintbrush, Gem, Shield, GraduationCap, Calendar
 } from 'lucide-react';
-import img from '../assets/pexels-steve-1070534.jpg'
+import img from '../assets/pexels-steve-1070534.jpg';
 
 import HeroCarousel from '../components/HeroCarousel';
 import ProductCard from '../components/ProductCard';
@@ -58,8 +48,7 @@ function HomePage() {
     {
       id: 'the-language-of-color',
       title: 'The Language of Color: Emotion in Abstract Art',
-      image:
-        img,
+      image: img,
       excerpt:
         'Colors speak before shapes do. Explore how hue and contrast carry meaning and shape mood.',
     },
@@ -83,58 +72,15 @@ function HomePage() {
 
   return (
     <div className="min-vh-100">
-      {/* HERO */}
-      <section className="position-relative vh-100 d-flex align-items-center justify-content-center overflow-hidden">
-        <HeroCarousel />
-        <div className="position-absolute" style={{ inset: 0, background: 'rgba(0,0,0,.40)' }} />
-
-        <div className="position-relative text-center text-white container px-4" style={{ zIndex: 1, maxWidth: 960 }}>
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <h1
-              className="fw-bold mb-4 display-3"
-              style={{
-                background: 'linear-gradient(90deg,#ffffff,#fda4af)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
-            >
-              Discover Original Art
-            </h1>
-
-            <p className="lead mb-5 text-white-50 mx-auto" style={{ maxWidth: 720 }}>
-              Handcrafted paintings and artworks that bring beauty, emotion, and inspiration to your space
-            </p>
-
-            <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-              <Link to="/shop">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn btn-danger d-inline-flex align-items-center gap-2 px-4 py-3 fw-semibold rounded-pill"
-                >
-                  <span>Shop Now</span>
-                  <ArrowRight size={18} />
-                </motion.button>
-              </Link>
-
-              <Link to="/gallery">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn px-4 py-3 fw-semibold rounded-pill"
-                  style={{
-                    color: '#fff',
-                    background: 'rgba(255,255,255,.20)',
-                    border: '1px solid rgba(255,255,255,.35)',
-                    backdropFilter: 'blur(6px)'
-                  }}
-                >
-                  Explore Gallery
-                </motion.button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
+      {/* HERO: let the carousel render slide-specific content */}
+      <section className="position-relative vh-100 overflow-hidden">
+        <HeroCarousel
+          autoPlay
+          interval={4000}
+          showArrows
+          showIndicators
+        />
+        {/* Removed the duplicate gradient and headline since the carousel now overlays per-slide content for accessibility and clarity */}
       </section>
 
       {/* STATS */}
@@ -205,7 +151,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ART CLASSES (NEW) */}
+      {/* ART CLASSES */}
       <section className="py-5 bg-white">
         <div className="container">
           <motion.div
@@ -355,7 +301,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* LATEST FROM THE BLOG */}
+      {/* BLOG */}
       <section className="py-5 bg-white">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between mb-3">

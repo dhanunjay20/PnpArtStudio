@@ -1,6 +1,5 @@
-// admin/src/pages/GalleryPage.jsx
 import React, { useEffect, useState } from "react";
-import { Image as ImageIcon, Trash2, Plus } from "lucide-react";
+import { Image as ImageIcon, Trash2, Plus, Pencil, Save, X, Upload } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "../pages/admin.css";
@@ -14,69 +13,208 @@ const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 axios.defaults.withCredentials = true;
 
 async function uploadToCloudinary(file, folder = "pnpart/gallery") {
-  if (!CLOUD_NAME || !UPLOAD_PRESET) {
-    throw new Error("Cloudinary env missing");
-  }
+  if (!CLOUD_NAME || !UPLOAD_PRESET) throw new Error("Cloudinary env missing");
   const fd = new FormData();
   fd.append("file", file);
   fd.append("upload_preset", UPLOAD_PRESET);
   fd.append("folder", folder);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-    method: "POST",
-    body: fd
-  });
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: fd });
   const data = await res.json();
-  if (!res.ok || !data.secure_url) {
-    throw new Error(data?.error?.message || "Cloudinary upload failed");
-  }
+  if (!res.ok || !data.secure_url) throw new Error(data?.error?.message || "Cloudinary upload failed");
   return { url: data.secure_url, publicId: data.public_id };
 }
 
-const GalleryPage = () => {
+const categories = ["Paintings", "Handcrafted Items", "Exhibitions", "Other"];
+const fallbackImg = `data:image/svg+xml;charset=UTF-8,` + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">
+     <rect width="100%" height="100%" fill="#f3f4f6"/>
+     <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-size="16" font-family="Arial">
+       Image
+     </text>
+   </svg>`
+);
+
+export default function GalleryPage() {
   const [items, setItems] = useState([]);
-  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Add modal
+  const [addOpen, setAddOpen] = useState(false);
+  const [addForm, setAddForm] = useState({
+    title: "",
+    category: "Paintings",
+    year: new Date().getFullYear(),
+    medium: "",
+    description: "",
+    file: null
+  });
+
+  // Edit modal
+  const [editOpen, setEditOpen] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    category: "Paintings",
+    year: new Date().getFullYear(),
+    medium: "",
+    description: "",
+    replaceFile: null
+  });
+
+  // Close on Escape
+  useEffect(() => {
+    const onEsc = (e) => {
+      if (e.key === "Escape") {
+        if (addOpen) setAddOpen(false);
+        if (editOpen) setEditOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onEsc);
+    return () => document.removeEventListener("keydown", onEsc);
+  }, [addOpen, editOpen]); // accessible escape-to-close [16]
 
   const load = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(GALLERY_URL, { withCredentials: true });
-      setItems(Array.isArray(res.data?.items) ? res.data.items : []);
+      const list = Array.isArray(res.data?.items) ? res.data.items : [];
+      setItems(list);
     } catch (e) {
       console.error(e);
       toast.error("Failed to load gallery");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => { load(); }, []);
 
-  const onFiles = async (files) => {
-    const list = Array.from(files || []);
-    if (!list.length) return;
-    setUploading(true);
+  const openAdd = () => {
+    setAddForm({
+      title: "",
+      category: "Paintings",
+      year: new Date().getFullYear(),
+      medium: "",
+      description: "",
+      file: null
+    });
+    setAddOpen(true);
+  };
+
+  const submitAdd = async () => {
     try {
-      const uploads = [];
-      for (const f of list) {
-        const { url, publicId } = await uploadToCloudinary(f);
-        uploads.push({ url, publicId });
+      if (!addForm.file) return toast.error("Please select an image");
+      setLoading(true);
+
+      // 1) Upload to Cloudinary
+      const { url, publicId } = await uploadToCloudinary(addForm.file);
+
+      // 2) Build full metadata item
+      const item = {
+        title: addForm.title?.trim() || "Untitled",
+        category: addForm.category || "Paintings",
+        year: Number(addForm.year) || new Date().getFullYear(),
+        medium: addForm.medium || "",
+        description: addForm.description || "",
+        src: url,
+        cloudinaryPublicId: publicId,
+        tags: []
+      };
+
+      // 3) Preferred POST shape: items[]
+      let res;
+      try {
+        res = await axios.post(GALLERY_URL, { items: [item] }, {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true
+        });
+      } catch (err) {
+        // 4) Fallback: images + meta
+        if (err?.response?.status === 400) {
+          res = await axios.post(GALLERY_URL, {
+            images: [{ url, publicId }],
+            meta: {
+              title: item.title,
+              category: item.category,
+              year: item.year,
+              medium: item.medium,
+              description: item.description,
+              tags: item.tags
+            }
+          }, {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true
+          });
+        } else {
+          throw err;
+        }
       }
-      const res = await axios.post(GALLERY_URL, { images: uploads }, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true
-      });
+
       const created = Array.isArray(res.data?.items) ? res.data.items : [];
       setItems((prev) => [...created, ...prev]);
-      toast.success("Images uploaded");
+      setAddOpen(false);
+      toast.success("Gallery item added");
     } catch (e) {
       console.error(e);
-      toast.error(e.message || "Upload failed");
+      const msg = e?.response?.data?.message || e?.message || "Add failed";
+      toast.error(msg);
     } finally {
-      setUploading(false);
+      setLoading(false);
     }
   };
 
-  const removeAt = async (idOrUrl) => {
+  const startEdit = (item) => {
+    setEditItem(item);
+    setEditForm({
+      title: item.title || "Untitled",
+      category: item.category || "Paintings",
+      year: item.year || new Date().getFullYear(),
+      medium: item.medium || "",
+      description: item.description || "",
+      replaceFile: null
+    });
+    setEditOpen(true);
+  };
+
+  const saveEdit = async () => {
+    if (!editItem?._id) return toast.error("Invalid item id");
     try {
-      await axios.delete(`${GALLERY_URL}/${encodeURIComponent(idOrUrl)}`, { withCredentials: true });
-      setItems((arr) => arr.filter((g) => (g._id || g.url) !== idOrUrl));
+      setLoading(true);
+      let body = {
+        title: editForm.title?.trim() || "Untitled",
+        category: editForm.category || "Paintings",
+        year: Number(editForm.year) || new Date().getFullYear(),
+        medium: editForm.medium || "",
+        description: editForm.description || ""
+      };
+
+      // Optional image replacement
+      if (editForm.replaceFile) {
+        const { url, publicId } = await uploadToCloudinary(editForm.replaceFile);
+        body = { ...body, src: url, cloudinaryPublicId: publicId, oldPublicId: editItem.cloudinaryPublicId || "" };
+      }
+
+      const { data } = await axios.patch(`${GALLERY_URL}/${editItem._id}`, body, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true
+      });
+
+      setItems((arr) => arr.map((g) => (String(g._id) === String(editItem._id) ? { ...g, ...data } : g)));
+      setEditOpen(false);
+      setEditItem(null);
+      toast.success("Updated");
+    } catch (e) {
+      console.error(e);
+      toast.error("Update failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeAt = async (id) => {
+    try {
+      await axios.delete(`${GALLERY_URL}/${encodeURIComponent(id)}`, { withCredentials: true });
+      setItems((arr) => arr.filter((g) => String(g._id) !== String(id)));
       toast.success("Image removed");
     } catch (e) {
       console.error(e);
@@ -89,43 +227,196 @@ const GalleryPage = () => {
       <div className="d-flex align-items-center justify-content-between mb-3">
         <div>
           <h1 className="h4 fw-bold mb-0">Gallery</h1>
-          <small className="text-muted">Upload images showcased on the public gallery</small>
+          <small className="text-muted">Upload and manage images shown on the public gallery</small>
         </div>
-        <label className="img-uploader m-0">
-          <input type="file" accept="image/*" multiple hidden onChange={(e) => onFiles(e.target.files)} />
-          <Plus size={18} className="me-1" />
-          {uploading ? "Uploading…" : "Add images"}
-        </label>
+        <button type="button" className="btn btn-danger d-inline-flex align-items-center gap-2" onClick={openAdd}>
+          <Plus size={18} />
+          {loading ? "Working…" : "Add item"}
+        </button>
       </div>
 
-      {/* Mobile-friendly thumbnail grid using flex-wrap */}
+      {/* Grid */}
       <div className="d-flex flex-wrap gap-2">
         {items.map((g, i) => {
-          const key = g._id || g.url || i;
-          const src = g.url || g;
+          const key = g._id || g.src || g.url || i;
+          const src = g.src || g.url || fallbackImg;
           return (
-            <div className="img-tile" key={key}>
-              <img src={src} alt={`gallery-${i}`} />
-              <button
-                type="button"
-                className="btn btn-sm btn-light remove"
-                onClick={() => removeAt(g._id || g.url)}
-                aria-label="Remove image"
-                title="Remove"
-              >
-                ×
-              </button>
+            <div className="img-tile position-relative" key={key} style={{ width: 170, height: 170, borderRadius: 12, overflow: "hidden", background: "#f8f9fa" }}>
+              <img
+                src={src}
+                alt={g.title || `gallery-${i}`}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                onError={(e) => { e.currentTarget.src = fallbackImg; }}
+              />
+              <div className="tile-actions position-absolute top-0 end-0 m-2 d-flex gap-1">
+                <button type="button" className="btn btn-sm btn-light" title="Edit" onClick={() => startEdit(g)}>
+                  <Pencil size={16} />
+                </button>
+                <button type="button" className="btn btn-sm btn-danger" title="Delete" onClick={() => removeAt(g._id)}>
+                  <Trash2 size={16} />
+                </button>
+              </div>
+              <span className="badge bg-light text-dark position-absolute bottom-0 start-0 m-2">{g.category || "—"}</span>
             </div>
           );
         })}
-        {items.length === 0 && (
+        {items.length === 0 && !loading && (
           <div className="text-muted small d-flex align-items-center gap-2">
             <ImageIcon size={16} /> No images yet.
           </div>
         )}
       </div>
+
+      {/* Add Modal */}
+      {addOpen && (
+        <>
+          <div className="modal-backdrop fade show" style={{ zIndex: 1050 }} />
+          <div
+            className="modal fade show"
+            style={{ display: "block", zIndex: 1055 }}
+            onClick={() => setAddOpen(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-content position-relative">
+                <button
+                  type="button"
+                  aria-label="Close"
+                  className="btn btn-sm btn-light btn-modal-close"
+                  style={{ top: 8, right: 8, position: 'absolute', cursor: 'pointer', zIndex: 2, pointerEvents: 'auto' }}
+                  onClick={() => setAddOpen(false)}
+                  title="Close"
+                >
+                  <X size={16} />
+                </button>
+                <div className="modal-body p-4">
+                  <h2 className="h5 fw-bold mb-3">Add Gallery Item</h2>
+                  <div className="vstack gap-3">
+                    <div className="row g-3">
+                      <div className="col-12">
+                        <label className="form-label small fw-semibold">Title</label>
+                        <input className="form-control" value={addForm.title} onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))} />
+                      </div>
+                      <div className="col-6">
+                        <label className="form-label small fw-semibold">Category</label>
+                        <select className="form-select" value={addForm.category} onChange={(e) => setAddForm((f) => ({ ...f, category: e.target.value }))}>
+                          {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div className="col-6">
+                        <label className="form-label small fw-semibold">Year</label>
+                        <input type="number" className="form-control" value={addForm.year} onChange={(e) => setAddForm((f) => ({ ...f, year: Number(e.target.value || new Date().getFullYear()) }))} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label small fw-semibold">Medium</label>
+                      <input className="form-control" value={addForm.medium} onChange={(e) => setAddForm((f) => ({ ...f, medium: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="form-label small fw-semibold">Description</label>
+                      <textarea className="form-control" rows={4} value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="form-label small fw-semibold">Image</label>
+                      <div className="border rounded-3 p-3 d-flex align-items-center justify-content-between">
+                        <input type="file" accept="image/*" onChange={(e) => setAddForm((f) => ({ ...f, file: e.target.files?. [0] || null }))} />
+                        <div className="text-muted small d-flex align-items-center gap-2">
+                          <Upload size={16} /> {addForm.file ? addForm.file.name : "Select an image"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="d-flex justify-content-end">
+                      <button type="button" className="btn btn-danger d-inline-flex align-items-center gap-2" onClick={submitAdd} disabled={loading}>
+                        <Save size={16} /> {loading ? "Saving…" : "Add item"}
+                      </button>
+                    </div>
+                    <small className="text-muted">The image is uploaded first, then all form details are saved to the database.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Edit Modal */}
+      {editOpen && (
+        <>
+          <div className="modal-backdrop fade show" style={{ zIndex: 1050 }} />
+          <div
+            className="modal fade show"
+            style={{ display: "block", zIndex: 1055 }}
+            onClick={() => setEditOpen(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-content position-relative">
+                <button
+                  type="button"
+                  aria-label="Close"
+                  className="btn btn-sm btn-light btn-modal-close"
+                  style={{ top: 8, right: 8, position: 'absolute', cursor: 'pointer', zIndex: 2, pointerEvents: 'auto' }}
+                  onClick={() => setEditOpen(false)}
+                  title="Close"
+                >
+                  <X size={16} />
+                </button>
+                <div className="modal-body p-4">
+                  <h2 className="h5 fw-bold mb-3">Edit Gallery Item</h2>
+                  <div className="vstack gap-3">
+                    <div className="row g-3">
+                      <div className="col-12">
+                        <label className="form-label small fw-semibold">Title</label>
+                        <input className="form-control" value={editForm.title} onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))} />
+                      </div>
+                      <div className="col-6">
+                        <label className="form-label small fw-semibold">Category</label>
+                        <select className="form-select" value={editForm.category} onChange={(e) => setEditForm((f) => ({ ...f, category: e.target.value }))}>
+                          {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div className="col-6">
+                        <label className="form-label small fw-semibold">Year</label>
+                        <input type="number" className="form-control" value={editForm.year} onChange={(e) => setEditForm((f) => ({ ...f, year: Number(e.target.value || new Date().getFullYear()) }))} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label small fw-semibold">Medium</label>
+                      <input className="form-control" value={editForm.medium} onChange={(e) => setEditForm((f) => ({ ...f, medium: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="form-label small fw-semibold">Description</label>
+                      <textarea className="form-control" rows={4} value={editForm.description} onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="form-label small fw-semibold">Replace Image (optional)</label>
+                      <div className="border rounded-3 p-3 d-flex align-items-center justify-content-between">
+                        <input type="file" accept="image/*" onChange={(e) => setEditForm((f) => ({ ...f, replaceFile: e.target.files?. [0] || null }))} />
+                        <div className="text-muted small d-flex align-items-center gap-2">
+                          <Upload size={16} /> {editForm.replaceFile ? editForm.replaceFile.name : "Choose new image"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="d-flex justify-content-end">
+                      <button type="button" className="btn btn-danger d-inline-flex align-items-center gap-2" onClick={saveEdit} disabled={loading}>
+                        <Save size={16} /> {loading ? "Saving…" : "Save changes"}
+                      </button>
+                    </div>
+                    <small className="text-muted">If you choose a new image, it uploads first, then the item is updated with the new URL and metadata.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Ensure pointer cursor on close icons in case global CSS overrides */}
+      <style>{`
+        .btn-modal-close { cursor: pointer; }
+      `}</style>
     </div>
   );
-};
-
-export default GalleryPage;
+}

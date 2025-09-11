@@ -27,6 +27,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import ReturnsPage from "./pages/ReturnsPage";
 import ShippingPage from "./pages/ShippingPage";
 import ArtClassesPage from "./pages/ArtClassesPage";
+import OrderSuccess from './pages/OrderSuccess';
 
 import { CartProvider } from "./context/CartContext";
 
@@ -36,6 +37,7 @@ import BackToTop from "./components/BackToTop";
 
 // Floating cart
 import FallingCart from "./components/FallingCart";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 // Helper rendered inside Router so useLocation works
 const RouteAwareFallingCart = () => {
@@ -90,6 +92,10 @@ const App = () => {
                 <Route path="/returns" element={<ReturnsPage />} />
                 <Route path="/shipping" element={<ShippingPage />} />
                 <Route path="*" element={<PageNotFound />} />
+                <Route path="order/success" element={<OrderConfirmation />} />
+                <Route path="/order/success" element={<OrderSuccess />} />
+                <Route path="/order/confirmation" element={<OrderSuccess />} />
+
               </Routes>
             </main>
             <Footer />

@@ -1,21 +1,20 @@
-// service/src/models/GalleryItem.js
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const GalleryItemSchema = new mongoose.Schema(
   {
-    url: { type: String, required: true, trim: true },
-    publicId: { type: String, trim: true }, // optional: used for server-side deletion in routes
-    uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+    title: { type: String, required: true, trim: true, default: 'Untitled' },
+    category: { type: String, required: true, enum: ['Paintings', 'Handcrafted Items', 'Exhibitions', 'Other'], default: 'Paintings' },
+    year: { type: Number, default: new Date().getFullYear(), index: true },
+    medium: { type: String, default: '' },
+    description: { type: String, default: '' },
+    src: { type: String, required: true },
+    cloudinaryPublicId: { type: String, default: '' },
+    tags: { type: [String], default: [] }
   },
-  { timestamps: true } // adds createdAt and updatedAt automatically
+  { timestamps: true }
 );
 
-// Hide __v in JSON responses but keep versioning internally if needed
-GalleryItemSchema.set("toJSON", {
-  transform: (doc, ret) => {
-    delete ret.__v;
-    return ret;
-  }
-});
+// Text index for search across multiple fields
+GalleryItemSchema.index({ title: 'text', description: 'text', medium: 'text' });
 
-export default mongoose.model("GalleryItem", GalleryItemSchema);
+export default mongoose.model('GalleryItem', GalleryItemSchema);

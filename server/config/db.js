@@ -1,8 +1,8 @@
-// src/config/db.js
 import mongoose from 'mongoose';
 
 export async function connectDB(uri) {
-  mongoose.set('strictQuery', true); // optional strict mode [12]
+  if (!uri) throw new Error('MONGODB_URI missing');
+  mongoose.set('strictQuery', true);
   await mongoose.connect(uri);
-  console.log('MongoDB connected');
+  console.log('Mongo connected');
 }

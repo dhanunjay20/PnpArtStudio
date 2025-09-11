@@ -6,7 +6,7 @@ import {
   Mail, MapPin, Phone, Instagram, Facebook, Twitter, Youtube, ArrowRight
 } from 'lucide-react';
 import './Footer.css';
-import logo from '../assets/pnpfooterlogo.png'; 
+import logo from '../assets/pnplogo2.svg'; 
 
 const year = new Date().getFullYear();
 

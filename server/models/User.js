@@ -1,24 +1,15 @@
-// api/models/User.js
+// models/User.js
 import mongoose from 'mongoose';
 
-const UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
-    email: {
-      type: String, unique: true, required: true, index: true, lowercase: true, trim: true
-    },
-    passwordHash: { type: String, required: true, select: false },
-    name: { type: String, required: true, trim: true },
+    name: { type: String, trim: true, required: true },
+    email: { type: String, trim: true, unique: true, required: true, lowercase: true },
     phone: { type: String, trim: true },
-    isAdmin: { type: Boolean, default: false } // flag for admin portal access
+    password: { type: String, required: true }, // bcrypt hash
+    role: { type: String, enum: ['admin','user'], default: 'admin' }
   },
   { timestamps: true }
 );
 
-UserSchema.set('toJSON', {
-  transform: (doc, ret) => {
-    delete ret.passwordHash;
-    return ret;
-  }
-});
-
-export default mongoose.model('User', UserSchema);
+export const User = mongoose.model('User', userSchema);
