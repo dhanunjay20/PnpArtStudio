@@ -214,7 +214,7 @@ const ArtClassesPage = () => {
                         {s.mode === "Online" ? "Online Live" : "Studio"}
                       </span>
                       <div className="fw-semibold" style={{ color: "#d63384" }}>
-                        ₹{Number(s.price || 0).toLocaleString()}
+                        ${Number(s.price || 0).toLocaleString()}
                       </div>
                     </div>
 

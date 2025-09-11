@@ -1,19 +1,13 @@
-// server/controllers/gallery.controller.js
 import GalleryItem from '../models/GalleryItem.js';
 import { v2 as cloudinary } from 'cloudinary';
-
-// Escape user input for safe regex
-const escapeRegex = (s = '') => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // GET /api/gallery
 export async function listGallery(req, res, next) {
   try {
-    // Distinct categories helper
     if (req.query.distinct === 'category') {
       const values = await GalleryItem.distinct('category');
       return res.json({ values });
     }
-
     const page = Math.max(1, parseInt(req.query.page || '1', 10));
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit || '24', 10)));
     const q = (req.query.q || '').trim();
@@ -22,57 +16,23 @@ export async function listGallery(req, res, next) {
     const match = {};
     if (category && category !== 'All') match.category = category;
 
-    let items = [];
-    let total = 0;
-
+    let query = GalleryItem.find(match);
     if (q) {
-      // Preferred: top-level $text per MongoDB rules (NOT inside $or)
-      try {
-        const textMatch = { ...match, $text: { $search: q } };
-        total = await GalleryItem.countDocuments(textMatch);
-        items = await GalleryItem.find(textMatch, { score: { $meta: 'textScore' } })
-          .sort({ score: { $meta: 'textScore' }, createdAt: -1, _id: -1 })
-          .skip((page - 1) * limit)
-          .limit(limit)
-          .lean();
-      } catch (e) {
-        // Fallback: case-insensitive partial match for substring searches or missing index
-        const rx = new RegExp(escapeRegex(q), 'i');
-        const rxMatch = {
-          ...match,
-          $or: [
-            { title: rx },
-            { description: rx },
-            { medium: rx }
-          ]
-        };
-        total = await GalleryItem.countDocuments(rxMatch);
-        items = await GalleryItem.find(rxMatch)
-          .sort({ createdAt: -1, _id: -1 })
-          .skip((page - 1) * limit)
-          .limit(limit)
-          .lean();
-      }
-    } else {
-      // No search term
-      const base = GalleryItem.find(match);
-      total = await base.clone().countDocuments();
-      items = await base
-        .sort({ createdAt: -1, _id: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean();
+      query = GalleryItem.find({
+        ...match,
+        $or: [
+          { $text: { $search: q } },
+          { title: { $regex: q, $options: 'i' } },
+          { description: { $regex: q, $options: 'i' } },
+          { medium: { $regex: q, $options: 'i' } }
+        ]
+      });
     }
 
-    return res.json({
-      items,
-      total,
-      page,
-      pages: Math.max(1, Math.ceil(total / limit))
-    });
-  } catch (err) {
-    next(err);
-  }
+    const total = await query.clone().countDocuments();
+    const items = await query.sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit).lean();
+    res.json({ items, total, page, pages: Math.max(1, Math.ceil(total / limit)) });
+  } catch (err) { next(err); }
 }
 
 // POST /api/gallery
@@ -109,9 +69,7 @@ export async function createGalleryItems(req, res, next) {
       return res.status(400).json({ message: 'No items or images provided' });
     }
 
-    if (!docs.every(d => d?.src)) {
-      return res.status(400).json({ message: 'Each item requires src' });
-    }
+    if (!docs.every(d => d?.src)) return res.status(400).json({ message: 'Each item requires src' });
 
     const created = await GalleryItem.insertMany(docs);
     res.status(201).json({ items: created });
@@ -131,8 +89,7 @@ export async function updateGalleryItem(req, res, next) {
     });
 
     if (req.body.oldPublicId && req.body.oldPublicId !== req.body.cloudinaryPublicId) {
-      try { await cloudinary.uploader.destroy(req.body.oldPublicId); }
-      catch (e) { console.error('Cloudinary destroy failed:', e?.message); }
+      try { await cloudinary.uploader.destroy(req.body.oldPublicId); } catch (e) { console.error('Cloudinary destroy failed:', e?.message); }
     }
 
     await GalleryItem.updateOne({ _id: id }, { $set: payload });
@@ -150,8 +107,7 @@ export async function deleteGalleryItem(req, res, next) {
     if (!doc) return res.status(404).json({ message: 'Not found' });
 
     if (doc.cloudinaryPublicId) {
-      try { await cloudinary.uploader.destroy(doc.cloudinaryPublicId); }
-      catch (e) { console.error('Cloudinary destroy failed:', e?.message); }
+      try { await cloudinary.uploader.destroy(doc.cloudinaryPublicId); } catch (e) { console.error('Cloudinary destroy failed:', e?.message); }
     }
 
     await GalleryItem.deleteOne({ _id: id });
