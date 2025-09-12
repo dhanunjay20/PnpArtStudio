@@ -4,7 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a9300d3-28f7-4b85-bca4-25b626e205e4" name="Changes" comment="" />
+    <list default="true" id="7a9300d3-28f7-4b85-bca4-25b626e205e4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09-09-2025_20_30_[Changes]/shelved.patch" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09-09-2025_20_30_[Changes]/shelved.patch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/src/pages/OrdersPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/admin/src/pages/OrdersPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/data/Products.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/CheckoutPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/CheckoutPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/HomePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/HomePage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/config/stripe.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/checkout.controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/webhooks.controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/models/Order.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/checkout.routes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/webhooks.routes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -38,16 +53,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dhanunjay/IdeaProjects/PnpArtStudio&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "jay-pnp",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Dhanunjay/IdeaProjects/PnpArtStudio"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="PnpArtStudio" />

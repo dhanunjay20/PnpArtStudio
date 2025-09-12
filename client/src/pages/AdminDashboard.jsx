@@ -453,7 +453,7 @@ const AdminDashboard = () => {
                             {sale !== null ? (
                               <>
                                 <span className="text-muted text-decoration-line-through me-1">
-                                  ₹{price.toFixed(2)}
+                                  ${price.toFixed(2)}
                                 </span>
                                 <span className="fw-semibold">₹{sale.toFixed(2)}</span>
                               </>

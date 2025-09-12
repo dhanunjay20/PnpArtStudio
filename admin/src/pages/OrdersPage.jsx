@@ -95,7 +95,7 @@ const OrdersPage = () => {
                   const id = o._id || "";
                   const short = (o.orderNo || id || "").toString().slice(-6);
                   const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleString() : "-";
-                  const totalStr = `₹${Number(o.total || 0).toFixed(2)}`;
+                  const totalStr = `$${Number(o.total || 0).toFixed(2)}`;
                   return (
                     <tr key={id}>
                       <td>{short}</td>
@@ -226,8 +226,8 @@ const OrdersPage = () => {
                         <tr key={idx}>
                           <td>{it.title}</td>
                           <td className="text-end">{qty}</td>
-                          <td className="text-end">₹{price.toFixed(2)}</td>
-                          <td className="text-end">₹{(qty * price).toFixed(2)}</td>
+                          <td className="text-end">${price.toFixed(2)}</td>
+                          <td className="text-end">${(qty * price).toFixed(2)}</td>
                         </tr>
                       );
                     })}
@@ -241,23 +241,23 @@ const OrdersPage = () => {
               <div className="d-flex flex-column gap-1 small">
                 <div className="d-flex justify-content-between">
                   <span>Subtotal</span>
-                  <span>₹{Number(openOrder.subTotal || 0).toFixed(2)}</span>
+                  <span>${Number(openOrder.subTotal || 0).toFixed(2)}</span>
                 </div>
                 <div className="d-flex justify-content-between">
                   <span>Discounts</span>
-                  <span>-₹{Array.isArray(openOrder.discounts) ? openOrder.discounts.reduce((s, d) => s + Number(d?.amount || 0), 0).toFixed(2) : "0.00"}</span>
+                  <span>-${Array.isArray(openOrder.discounts) ? openOrder.discounts.reduce((s, d) => s + Number(d?.amount || 0), 0).toFixed(2) : "0.00"}</span>
                 </div>
                 <div className="d-flex justify-content-between">
                   <span>Shipping</span>
-                  <span>₹{Number(openOrder.shipping?.amount || 0).toFixed(2)}</span>
+                  <span>${Number(openOrder.shipping?.amount || 0).toFixed(2)}</span>
                 </div>
                 <div className="d-flex justify-content-between">
                   <span>Tax</span>
-                  <span>₹{Number(openOrder.tax || 0).toFixed(2)}</span>
+                  <span>${Number(openOrder.tax || 0).toFixed(2)}</span>
                 </div>
                 <div className="d-flex justify-content-between fw-semibold">
                   <span>Total</span>
-                  <span>₹{Number(openOrder.total || 0).toFixed(2)}</span>
+                  <span>${Number(openOrder.total || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>

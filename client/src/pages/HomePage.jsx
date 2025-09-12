@@ -1,18 +1,58 @@
 // src/pages/HomePage.jsx
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight, Star, Users, Award, Palette, Sparkles, Paintbrush, Gem, Shield, GraduationCap, Calendar
 } from 'lucide-react';
+import axios from 'axios';
 import img from '../assets/pexels-steve-1070534.jpg';
 
 import HeroCarousel from '../components/HeroCarousel';
 import ProductCard from '../components/ProductCard';
-import { sampleProducts } from '../data/Products';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 function HomePage() {
-  const featuredProducts = sampleProducts.slice(0, 6);
+  // Featured products from API
+  const [products, setProducts] = useState([]);
+  const [loadingProd, setLoadingProd] = useState(false);
+  const [prodErr, setProdErr] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      try {
+        setLoadingProd(true);
+        setProdErr('');
+        // Adjust the endpoint/params to match your backend
+        const { data } = await axios.get(`${API_BASE}/api/products`, {
+          params: { limit: 6 },
+          withCredentials: true
+        });
+        // Support either { items: [...] } or a raw array
+        const list = Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : []);
+        if (isMounted) setProducts(list);
+      } catch (e) {
+        if (isMounted) setProdErr('Failed to load products');
+      } finally {
+        if (isMounted) setLoadingProd(false);
+      }
+    };
+    load();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Normalize minimal fields ProductCard might need (id/image/back-compat)
+  const featuredProducts = useMemo(
+    () =>
+      (products || []).map((p) => ({
+        ...p,
+        id: p.id || p._id || p.sku || crypto.randomUUID(),
+        image: p.image || p.images?.[0] || p.cover || p.thumbnail
+      })),
+    [products]
+  );
 
   const testimonials = [
     {
@@ -72,15 +112,9 @@ function HomePage() {
 
   return (
     <div className="min-vh-100">
-      {/* HERO: let the carousel render slide-specific content */}
+      {/* HERO */}
       <section className="position-relative vh-100 overflow-hidden">
-        <HeroCarousel
-          autoPlay
-          interval={4000}
-          showArrows
-          showIndicators
-        />
-        {/* Removed the duplicate gradient and headline since the carousel now overlays per-slide content for accessibility and clarity */}
+        <HeroCarousel autoPlay interval={4000} showArrows showIndicators />
       </section>
 
       {/* STATS */}
@@ -210,7 +244,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS */}
+      {/* FEATURED PRODUCTS FROM API */}
       <section className="py-5 bg-white">
         <div className="container">
           <motion.div
@@ -226,19 +260,35 @@ function HomePage() {
             </p>
           </motion.div>
 
+          {prodErr && <div className="alert alert-danger">{prodErr}</div>}
+
           <div className="row g-4 mb-4">
-            {featuredProducts.map((product, idx) => (
-              <motion.div
-                key={product.id}
-                className="col-12 col-md-6 col-lg-4"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))}
+            {loadingProd ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="col-12 col-md-6 col-lg-4">
+                  <div className="card h-100 border-0 shadow-sm rounded-4 placeholder-wave" style={{ minHeight: 320 }}>
+                    <div className="card-body">
+                      <div className="placeholder col-12 mb-3" style={{ height: 180 }} />
+                      <div className="placeholder col-6" />
+                      <div className="placeholder col-4 mt-2" />
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              featuredProducts.map((product, idx) => (
+                <motion.div
+                  key={product.id}
+                  className="col-12 col-md-6 col-lg-4"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))
+            )}
           </div>
 
           <div className="text-center">

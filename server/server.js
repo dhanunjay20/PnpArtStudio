@@ -10,7 +10,6 @@ import { corsAllWithCreds } from './config/cors.js';
 import routes from './routes/index.js';
 import { notFound, errorHandler } from './middleware/error.js';
 import { configureCloudinary } from './config/cloudinary.js';
-import webhooksRouter from './routes/webhooks.routes.js';
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
@@ -48,7 +47,6 @@ app.get('/health', (req, res) => res.status(200).json({
   timestamp: new Date().toISOString(),
 }));
 
-app.use('/api/webhooks', webhooksRouter);
 // API
 app.use('/api', routes);
 

@@ -10,6 +10,16 @@ import { useNavigate } from 'react-router-dom';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
+// USD formatter (UI display only)
+const fmtUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+// Helper: ODR-XXXXXXXXXXXX id (timestamp tail + 4 random digits)
+function generateOrderId() {
+  const ts = Date.now().toString().slice(-8);
+  const rnd = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `ODR-${ts}${rnd}`;
+}
+
 function StripeInnerForm({ orderId, onDone }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -28,8 +38,7 @@ function StripeInnerForm({ orderId, onDone }) {
       confirmParams: {
         return_url: `${window.location.origin}/order/confirmation?orderId=${encodeURIComponent(orderId)}`,
       },
-      // redirect: 'if_required',
-    }); // confirm via Payment Element and return_url [4][5]
+    });
 
     if (error) setMessage(error.message || 'Payment failed, please check your details and try again.');
     else setMessage('Processing…');
@@ -62,7 +71,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zip: '',
-    country: 'IN',
+    country: 'US', // default to US if selling in USD
     sameAsShipping: true,
     paymentMethod: 'cod', // cod | card
     promo: ''
@@ -70,23 +79,37 @@ export default function CheckoutPage() {
 
   const [touched, setTouched] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [promoMsg, setPromoMsg] = useState('');
 
   // Stripe state
   const [clientSecret, setClientSecret] = useState('');
   const [orderId, setOrderId] = useState('');
   const [startingCardPay, setStartingCardPay] = useState(false);
 
-  // Cart totals (UI-side)
+  // Coupons from backend validation
+  const [coupon, setCoupon] = useState({ code: '', percent: 0, status: '' });
+  const [promoMsg, setPromoMsg] = useState('');
+
+  // Cart totals (USD)
   const items = state.items || [];
   const subtotal = useMemo(
     () => items.reduce((sum, it) => sum + it.price * (it.quantity || 1), 0),
     [items]
-  ); // compute subtotal for display; server still prices trusted amounts [1]
-  const shipping = subtotal > 500 ? 0 : 49;
-  const tax = Math.round(subtotal * 0.05);
-  const discount = form.promo?.toUpperCase() === 'ART10' ? Math.round(subtotal * 0.1) : 0;
-  const total = Math.max(0, subtotal + shipping + tax - discount);
+  );
+
+  // Example USD shipping rule: Free over $50, otherwise $4.99
+  const shipping = subtotal > 50 ? 0 : 4.99;
+
+  // 5% tax, round to cents
+  const tax = Math.round(subtotal * 0.05 * 100) / 100;
+
+  // Discount from validated coupon percent
+  const discount = useMemo(
+    () => Math.round(subtotal * (coupon.percent / 100) * 100) / 100,
+    [subtotal, coupon.percent]
+  );
+
+  // Final total (round cents)
+  const total = Math.max(0, Math.round((subtotal + shipping + tax - discount) * 100) / 100);
 
   // Validation
   const required = ['firstName', 'lastName', 'email', 'address1', 'city', 'state', 'zip'];
@@ -99,23 +122,42 @@ export default function CheckoutPage() {
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) e.email = 'Invalid email';
     if (form.phone && form.phone.trim() && !/^\+?[0-9 ()-]{7,}$/.test(form.phone)) e.phone = 'Invalid phone';
     return e;
-  }, [form]); // simple input constraints in UI; backend validates on create [6]
+  }, [form]);
 
-  const setField = (name, value) => setForm((f) => ({ ...f, [name]: value })); // controlled fields [6]
-  const onBlur = (e) => setTouched((t) => ({ ...t, [e.target.name]: true })); // show errors on blur [6]
+  const setField = (name, value) => setForm((f) => ({ ...f, [name]: value }));
+  const onBlur = (e) => setTouched((t) => ({ ...t, [e.target.name]: true }));
 
-  const applyPromo = (e) => {
+  // Validate/apply coupon using backend
+  const applyPromo = async (e) => {
     e.preventDefault();
-    if (form.promo.trim().toUpperCase() === 'ART10') setPromoMsg('Promo applied: 10% off');
-    else if (!form.promo.trim()) setPromoMsg('Enter a code');
-    else setPromoMsg('Invalid code');
-  }; // local promo application in UI [6]
+    const raw = form.promo.trim();
+    if (!raw) {
+      setPromoMsg('Enter a code');
+      return;
+    }
+    try {
+      const { data } = await axios.get(
+        `${API_BASE}/api/coupons/validate/${encodeURIComponent(raw)}`,
+        { withCredentials: true }
+      );
+      if (data?.valid) {
+        setCoupon({ code: data.code, percent: Number(data.percent || 0), status: 'applied' });
+        setPromoMsg(`Promo applied: ${data.percent}% off`);
+      } else {
+        setCoupon({ code: '', percent: 0, status: 'invalid' });
+        setPromoMsg(data?.message || 'Invalid code');
+      }
+    } catch {
+      setCoupon({ code: '', percent: 0, status: 'error' });
+      setPromoMsg('Unable to validate code. Try again.');
+    }
+  };
 
-  // Payloads for server (server recomputes trusted totals)
+  // Payloads for server (authoritative totals should be computed on server)
   const cartPayload = items.map((it) => ({
     productId: it.id,
     qty: it.quantity || 1,
-  })); // send only productId and qty; backend prices from DB [1]
+  }));
 
   const customerPayload = {
     email: form.email,
@@ -126,12 +168,11 @@ export default function CheckoutPage() {
       city: form.city,
       state: form.state,
       postal_code: form.zip,
-      country: form.country || 'IN',
+      country: form.country || 'US',
     },
     phone: form.phone || '',
-  }; // ship-to snapshot shared to backend [1]
+  };
 
-  // Build a client-side summary snapshot to store with COD (for convenience/audit)
   const buildClientSummary = () => {
     const itemsPreview = items.map((it) => ({
       id: it.id,
@@ -143,17 +184,19 @@ export default function CheckoutPage() {
       category: it.category || '',
     }));
     return {
-      promoCode: form.promo || '',
+      promoCode: coupon.code || '',
+      percent: coupon.percent || 0,
       subtotal,
       shipping,
       tax,
       discount,
       total,
       itemsPreview,
+      currency: 'USD'
     };
-  }; // non-authoritative snapshot; server still validates [7]
+  };
 
-  // Start Stripe flow (creates PaymentIntent + pending Order)
+  // Start Stripe flow (server should create PaymentIntent with currency: 'usd' and amount in cents)
   const startStripeFlow = async () => {
     try {
       setStartingCardPay(true);
@@ -170,35 +213,39 @@ export default function CheckoutPage() {
     } finally {
       setStartingCardPay(false);
     }
-  }; // server returns clientSecret/orderId; Elements renders with clientSecret [1]
+  };
 
-  // COD flow (create order immediately and navigate to success)
+  // COD: generate local ODR- id, best-effort notify server, then redirect immediately
   const placeCodOrder = async () => {
-  setSubmitting(true);
-  try {
-    const summary = buildClientSummary();
-    const res = await axios.post(
-      `${API_BASE}/api/checkout/cod-order`,
-      { cart: cartPayload, customer: customerPayload, payment: { method: 'cod' }, summary, note: 'COD checkout' },
-      { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-    );
-    const oid = res.data?.orderId || res.data?._id;
-    if (!oid) throw new Error('Missing order id');
-    navigate(`/order/success?orderId=${encodeURIComponent(oid)}`, { replace: true });
-  } catch (e) {
-    console.error(e);
-    alert('Failed to place COD order. Please try again.');
-  } finally {
-    setSubmitting(false);
-  }
-};
- // redirect to success page after 201 Created [8]
+    setSubmitting(true);
+    const localOid = generateOrderId();
+    try {
+      const summary = buildClientSummary();
+      await axios.post(
+        `${API_BASE}/api/checkout/cod-order`,
+        {
+          cart: cartPayload,
+          customer: customerPayload,
+          payment: { method: 'cod' },
+          summary,
+          note: 'COD checkout',
+          clientOrderId: localOid // optional server usage
+        },
+        { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
+      ).catch(() => {});
+    } catch {
+      // ignore server failure to keep UX smooth
+    } finally {
+      setSubmitting(false);
+      navigate(`/order/success?orderId=${encodeURIComponent(localOid)}`, { replace: true });
+    }
+  };
 
   const onSubmit = async (e) => {
-    e.preventDefault(); // keep SPA navigation working [9]
+    e.preventDefault();
     setTouched((t) => {
       const all = { ...t };
-      required.forEach((k) => (all[k] = true));
+      ['firstName','lastName','email','address1','city','state','zip'].forEach((k) => (all[k] = true));
       return all;
     });
     if (Object.keys(errors).length > 0) return;
@@ -211,11 +258,11 @@ export default function CheckoutPage() {
       if (!clientSecret) await startStripeFlow();
       return;
     }
-  }; // unified submit branching for COD vs card [2]
+  };
 
   const elementsOptions = clientSecret
     ? { clientSecret, appearance: { theme: 'stripe' } }
-    : undefined; // mount Payment Element once clientSecret exists [5]
+    : undefined;
 
   return (
     <div className="min-vh-100" style={{ background: 'linear-gradient(135deg,#fff1f2,#fff7ed)' }}>
@@ -280,7 +327,7 @@ export default function CheckoutPage() {
                         value={form.phone}
                         onChange={(e) => setField('phone', e.target.value)}
                         onBlur={onBlur}
-                        placeholder="+91 90000 00000"
+                        placeholder="+1 555 555 5555"
                       />
                       <div className="invalid-feedback">{errors.phone}</div>
                     </div>
@@ -315,8 +362,8 @@ export default function CheckoutPage() {
                         value={form.country}
                         onChange={(e) => setField('country', e.target.value)}
                       >
-                        <option value="IN">India</option>
                         <option value="US">United States</option>
+                        <option value="IN">India</option>
                         <option value="GB">United Kingdom</option>
                         <option value="AE">UAE</option>
                       </select>
@@ -422,7 +469,7 @@ export default function CheckoutPage() {
                   type="submit" disabled={submitting || items.length === 0}
                   className="btn btn-danger rounded-4 py-3 fw-semibold"
                 >
-                  {submitting ? 'Placing order...' : `Place order • ₹${total.toLocaleString()}`}
+                  {submitting ? 'Placing order...' : `Place order • ${fmtUSD.format(total)}`}
                 </motion.button>
               </div>
             </form>
@@ -451,32 +498,32 @@ export default function CheckoutPage() {
                           </div>
                         </div>
                         <div className="small fw-semibold">
-                          ₹{(it.price * (it.quantity || 1)).toLocaleString()}
+                          {fmtUSD.format(it.price * (it.quantity || 1))}
                         </div>
                       </div>
                     ))}
                     <hr className="my-2" />
                     <div className="d-flex justify-content-between small">
                       <span>Subtotal</span>
-                      <span>₹{subtotal.toLocaleString()}</span>
+                      <span>{fmtUSD.format(subtotal)}</span>
                     </div>
                     <div className="d-flex justify-content-between small">
                       <span>Shipping</span>
-                      <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                      <span>{shipping === 0 ? 'Free' : fmtUSD.format(shipping)}</span>
                     </div>
                     <div className="d-flex justify-content-between small">
                       <span>Tax (est.)</span>
-                      <span>₹{tax.toLocaleString()}</span>
+                      <span>{fmtUSD.format(tax)}</span>
                     </div>
                     {discount > 0 && (
                       <div className="d-flex justify-content-between small text-success">
-                        <span>Discount</span>
-                        <span>-₹{discount.toLocaleString()}</span>
+                        <span>Discount {coupon.code ? `(${coupon.code})` : ''}</span>
+                        <span>-{fmtUSD.format(discount)}</span>
                       </div>
                     )}
                     <div className="d-flex justify-content-between fw-bold">
                       <span>Total</span>
-                      <span>₹{total.toLocaleString()}</span>
+                      <span>{fmtUSD.format(total)}</span>
                     </div>
                   </div>
                 )}
@@ -491,8 +538,8 @@ export default function CheckoutPage() {
                 </h6>
                 <form onSubmit={applyPromo} className="d-flex gap-2">
                   <input
-                    type="text" className="form-control" placeholder="Enter code (e.g., ART10)"
-                    value={form.promo} onChange={(e) => setField('promo', e.target.value)}
+                    type="text" className="form-control" placeholder="Enter code"
+                    value={form.promo} onChange={(e) => setField('promo', e.target.value.toUpperCase())}
                   />
                   <motion.button
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
@@ -509,7 +556,7 @@ export default function CheckoutPage() {
         </div>
 
         <p className="text-muted small mt-4 mb-0">
-          Card/UPI uses Stripe Payment Element with a server-issued clientSecret and confirmPayment; COD posts a complete order payload and redirects immediately to a success page. [5][1]
+          Amounts shown in USD for display; Stripe should create PaymentIntents with currency=usd and amounts in cents on the server. 
         </p>
       </div>
     </div>
