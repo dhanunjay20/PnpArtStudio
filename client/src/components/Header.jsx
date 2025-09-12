@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, User, Heart, X } from "lucide-react";
+import { ShoppingCart, Heart, X } from "lucide-react"; // removed User
 import { useCart } from "../context/CartContext";
 import CartDropdown from "./CartDropdown";
 import "./Header.css";
@@ -17,7 +17,7 @@ const Header = () => {
   const { totalItems, dispatch } = useCart();
   const location = useLocation();
 
-  // Detect hover-capable pointers (desktops/laptops)
+  // Detect hover-capable pointers
   useEffect(() => {
     const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
     const update = () => setCanHover(mq.matches);
@@ -30,7 +30,7 @@ const Header = () => {
     };
   }, []);
 
-  // Close Shop dropdown when clicking outside
+  // Click outside to close Shop
   useEffect(() => {
     const onDocClick = (e) => {
       if (!dropdownRef.current) return;
@@ -75,7 +75,6 @@ const Header = () => {
 
   const toggleNavbar = () => setIsOpen((v) => !v);
 
-  // Consider shop "active" on any /shop route (including subpaths)
   const isShopActive = location.pathname.startsWith("/shop");
 
   return (
@@ -156,7 +155,7 @@ const Header = () => {
                   </NavLink>
                 </li>
 
-                {/* Shop with Indian Products submenu */}
+                {/* Shop with nested submenu */}
                 <li
                   ref={dropdownRef}
                   className={`nav-item dropdown ${canHover ? "" : "dropdown-center"}`}
@@ -172,7 +171,6 @@ const Header = () => {
                     data-bs-toggle="dropdown"
                     data-bs-auto-close="outside"
                     onClick={(e) => {
-                      // Mobile/tablet: open on first tap, close on second
                       e.preventDefault();
                       setIsShopDropdownOpen((open) => !open);
                     }}
@@ -187,7 +185,6 @@ const Header = () => {
                     aria-labelledby="shopDropdown"
                     data-bs-display="static"
                   >
-                    {/* Top-level categories */}
                     {topCategories.map((c) => (
                       <li key={c.label}>
                         <NavLink
@@ -201,14 +198,12 @@ const Header = () => {
                       </li>
                     ))}
 
-                    {/* Divider */}
                     <li><hr className="dropdown-divider" /></li>
 
-                    {/* Indian Products nested submenu (dropend) */}
+                    {/* Indian Products submenu */}
                     <li
                       className="dropend"
                       onMouseEnter={canHover ? (e) => {
-                        // Keep submenu open while hovering (desktop)
                         const toggle = e.currentTarget.querySelector(".dropdown-toggle");
                         const menu = e.currentTarget.querySelector(".dropdown-menu");
                         if (toggle) toggle.classList.add("show");
@@ -227,11 +222,7 @@ const Header = () => {
                         role="button"
                         data-bs-toggle="dropdown"
                         data-bs-display="static"
-                        onClick={(ev) => {
-                          // Prevent immediate close on tap; allow submenu items to be tapped
-                          ev.preventDefault();
-                          ev.stopPropagation();
-                        }}
+                        onClick={(ev) => { ev.preventDefault(); ev.stopPropagation(); }}
                       >
                         Indian Products
                       </Link>
@@ -305,15 +296,18 @@ const Header = () => {
                 <CartDropdown />
               </li>
 
+              {/* Track Order CTA replaces Login/user */}
               <li className="nav-item">
                 <NavLink
-                  to="/login"
-                  className={({ isActive }) => `nav-link d-flex align-items-center nav-hover ${isActive ? "active" : ""}`}
+                  to="/track-order"
                   onClick={handleNavClick}
-                  aria-label="Login"
-                  title="Login"
+                  className={({ isActive }) =>
+                    `btn btn-danger fw-semibold text-white px-3 py-2 d-inline-flex align-items-center ${isActive ? "active" : ""}`
+                  }
+                  aria-label="Track Order"
+                  title="Track Order"
                 >
-                  <User size={20} />
+                  Track Order
                 </NavLink>
               </li>
             </ul>

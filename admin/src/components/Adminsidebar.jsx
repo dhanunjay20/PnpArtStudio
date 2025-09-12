@@ -1,7 +1,7 @@
 // admin/src/components/AdminSidebar.jsx
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutGrid, Package, GraduationCap, Images, Receipt, LogOut } from "lucide-react";
+import { LayoutGrid, Package, GraduationCap, Images, Receipt, LogOut, TicketPercent, Send } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -18,18 +18,12 @@ const AdminSidebar = () => {
 
   const handleLogout = async () => {
     try {
-      // Clear short-lived access token (client) first
       sessionStorage.removeItem("accessToken");
-
-      // Invalidate refresh cookie (server)
       await axios.post(LOGOUT_URL, {}, { withCredentials: true });
-
       toast.success("Logged out");
-      // Small delay so the toast is visible
       setTimeout(() => navigate("/admin/login", { replace: true }), 400);
-    } catch (e) {
+    } catch {
       toast.error("Logout failed");
-      // Even on failure, ensure navigation to login for safety
       setTimeout(() => navigate("/admin/login", { replace: true }), 400);
     }
   };
@@ -61,6 +55,15 @@ const AdminSidebar = () => {
         </NavLink>
         <NavLink to="/admin/orders" className={getClass}>
           <Receipt size={18} /> Orders
+        </NavLink>
+
+        {/* New: Coupons */}
+        <NavLink to="/admin/coupons" className={getClass}>
+          <TicketPercent size={18} /> Coupons
+        </NavLink>
+
+        <NavLink to="/admin/newsletters" className={getClass}>
+          <Send size={18} /> Newsletters
         </NavLink>
 
         <div className="px-3 text-muted small mt-3 mb-1">Overview</div>

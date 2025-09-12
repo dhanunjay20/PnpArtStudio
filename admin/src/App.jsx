@@ -10,6 +10,8 @@ import ClassesPage from "./pages/ClassesPage.jsx";
 import GalleryPage from "./pages/GalleryPage.jsx";
 import OrdersPage from "./pages/OrdersPage.jsx";
 import AdminRegister from "./pages/AdminRegister.jsx";
+import CouponsPage from "./pages/CouponsPage.jsx";
+import NewslettersPage from "./pages/NewslettersPage.jsx";
 
 // Simple guard using sessionStorage accessToken; replace with real auth as needed
 function RequireAdmin() {
@@ -37,6 +39,8 @@ export default function App() {
             <Route path="classes" element={<ClassesPage />} />
             <Route path="gallery" element={<GalleryPage />} />
             <Route path="orders" element={<OrdersPage />} />
+            <Route path="/admin/coupons" element={<CouponsPage />} />
+            <Route path="/admin/newsletters" element={<NewslettersPage />} />
           </Route>
         </Route>
 
