@@ -28,7 +28,7 @@ const SLIDE_CONTENT = {
   p2: {
     eyebrow: 'Limited Offer',
     heading: 'Free Shipping Over $100',
-    sub: 'Enjoy fast, secure delivery on eligible orders—no code required.',
+    sub: 'Enjoy fast, secure delivery on eligible orders no code required.',
     cta: { label: 'Explore collections', href: '/shop' }
   },
   p3: {
