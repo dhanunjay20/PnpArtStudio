@@ -322,7 +322,7 @@ export default function ShopPage() {
                   <div className="flex-grow-1">
                     <div className="fw-semibold mb-1">{p.title}</div>
                     <div className="text-muted small mb-1">{p.category}</div>
-                    <div className="text-danger fw-bold">₹{Number(p.price).toLocaleString("en-IN")}</div>
+                    <div className="text-danger fw-bold">${Number(p.price).toLocaleString("en-IN")}</div>
                   </div>
                 </div>
               </motion.div>

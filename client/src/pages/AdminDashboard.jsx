@@ -455,10 +455,10 @@ const AdminDashboard = () => {
                                 <span className="text-muted text-decoration-line-through me-1">
                                   ${price.toFixed(2)}
                                 </span>
-                                <span className="fw-semibold">₹{sale.toFixed(2)}</span>
+                                <span className="fw-semibold">${sale.toFixed(2)}</span>
                               </>
                             ) : (
-                              <span className="fw-semibold">₹{price.toFixed(2)}</span>
+                              <span className="fw-semibold">${price.toFixed(2)}</span>
                             )}
                           </td>
                           <td className="text-end">{p.stock}</td>
@@ -701,7 +701,7 @@ const AdminDashboard = () => {
                           <td>{c.mode}</td>
                           <td>{c.startDate || "-"}</td>
                           <td className="text-end">{c.seats}</td>
-                          <td className="text-end">{price !== null ? `₹${price.toFixed(2)}` : "-"}</td>
+                          <td className="text-end">{price !== null ? `$${price.toFixed(2)}` : "-"}</td>
                           <td>
                             <span className={`badge ${c.published ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary"}`}>
                               {c.published ? "Published" : "Draft"}

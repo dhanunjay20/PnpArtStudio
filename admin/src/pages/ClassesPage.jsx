@@ -403,7 +403,7 @@ export default function ClassesPage() {
                       <td className="d-none d-sm-table-cell">{c.mode}</td>
                       <td>{c.startDate || "-"}</td>
                       <td className="text-end d-none d-sm-table-cell">{c.seats}</td>
-                      <td className="text-end d-none d-md-table-cell">{price !== null ? `₹${price.toFixed(2)}` : "-"}</td>
+                      <td className="text-end d-none d-md-table-cell">{price !== null ? `$${price.toFixed(2)}` : "-"}</td>
                       <td className="d-none d-md-table-cell">
                         <span className={`badge ${c.published ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary"}`}>
                           {c.published ? "Published" : "Draft"}

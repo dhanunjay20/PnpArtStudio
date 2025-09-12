@@ -90,7 +90,7 @@ const ProductCard = ({ product }) => {
         <p className="text-muted small mb-3 line-clamp-2">{product.description}</p>
 
         <div className="mt-auto d-flex align-items-center justify-content-between">
-          <div className="fw-bold">₹{Number(product.price).toLocaleString("en-IN")}</div>
+          <div className="fw-bold">${Number(product.price).toLocaleString("en-IN")}</div>
           <div className="d-flex gap-2">
             <motion.button
               whileHover={{ scale: product.inStock ? 1.03 : 1 }}

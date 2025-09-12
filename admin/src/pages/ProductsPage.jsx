@@ -610,11 +610,11 @@ export default function ProductsPage() {
                       <td className="text-end">
                         {sale !== null ? (
                           <>
-                            <span className="text-muted text-decoration-line-through me-1">₹{price.toFixed(2)}</span>
-                            <span className="fw-semibold">₹{sale.toFixed(2)}</span>
+                            <span className="text-muted text-decoration-line-through me-1">${price.toFixed(2)}</span>
+                            <span className="fw-semibold">${sale.toFixed(2)}</span>
                           </>
                         ) : (
-                          <span className="fw-semibold">₹{price.toFixed(2)}</span>
+                          <span className="fw-semibold">${price.toFixed(2)}</span>
                         )}
                       </td>
                       <td className="text-end d-none d-sm-table-cell">{p.stock}</td>
@@ -716,8 +716,8 @@ export default function ProductsPage() {
             <div className="row g-2 small">
               <div className="col-6"><strong>Category:</strong> {active.category || "-"}</div>
               <div className="col-6"><strong>Subcategory:</strong> {active.category === "Indian Products" ? (active.subcategory || "-") : "-"}</div>
-              <div className="col-6"><strong>Price:</strong> ₹{Number(active.price || 0).toFixed(2)}</div>
-              <div className="col-6"><strong>Sale Price:</strong> {active.salePrice !== null ? `₹${Number(active.salePrice).toFixed(2)}` : "-"}</div>
+              <div className="col-6"><strong>Price:</strong> ${Number(active.price || 0).toFixed(2)}</div>
+              <div className="col-6"><strong>Sale Price:</strong> {active.salePrice !== null ? `$${Number(active.salePrice).toFixed(2)}` : "-"}</div>
               <div className="col-6"><strong>Stock:</strong> {active.stock}</div>
               <div className="col-6"><strong>In Stock:</strong> {active.inStock ? "Yes" : "No"}</div>
               <div className="col-6"><strong>Published:</strong> {active.published ? "Yes" : "No"}</div>
