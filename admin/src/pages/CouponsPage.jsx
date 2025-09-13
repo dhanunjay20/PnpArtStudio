@@ -1,4 +1,4 @@
-// admin/src/pages/CouponsPage.jsx
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -6,6 +6,8 @@ import { TicketPercent, RefreshCw, Pencil, Trash2, Power, PowerOff, X } from "lu
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
 const LIST_URL = `${API_BASE}/api/coupons`;
+
+axios.defaults.withCredentials = true;
 
 export default function CouponsPage() {
   const [code, setCode] = useState("");
@@ -111,89 +113,125 @@ export default function CouponsPage() {
   return (
     <div className="container py-4">
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <h2 className="h4 d-flex align-items-center gap-2 mb-0">
+        <h2 className="h4 d-flex align-items-center gap-2 mb-0" style={{ color: "#000" }}>
           <TicketPercent size={20} /> Coupons
         </h2>
-        <button className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2" onClick={load} disabled={loading}>
+        <button
+          className="mono-btn mono-btn-sm d-inline-flex align-items-center gap-2"
+          onClick={load}
+          disabled={loading}
+          type="button"
+          aria-label="Refresh"
+          title="Refresh"
+        >
           <RefreshCw size={16} /> Refresh
         </button>
       </div>
 
       <div className="row g-4">
         <div className="col-12 col-lg-5">
-          <div className="card border-0 shadow-sm rounded-4">
+          <div className="card border-0 shadow-sm rounded-4" style={{ background: "#fff", color: "#000" }}>
             <div className="card-body">
-              <h6 className="fw-semibold mb-3">Create coupon</h6>
+              <h6 className="fw-semibold mb-3" style={{ color: "#000" }}>Create coupon</h6>
               <form onSubmit={onCreate} className="vstack gap-3">
                 <div>
-                  <label className="form-label">Code</label>
-                  <input className="form-control" placeholder="e.g. ART10" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} required />
+                  <label className="form-label" style={{ color: "#000" }}>Code</label>
+                  <input
+                    className="form-control"
+                    placeholder="e.g. ART10"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    required
+                  />
                 </div>
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <label className="form-label">Percent off</label>
-                    <input type="number" min={1} max={100} className="form-control" value={percent} onChange={(e) => setPercent(Number(e.target.value))} required />
+                    <label className="form-label" style={{ color: "#000" }}>Percent off</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={100}
+                      className="form-control"
+                      value={percent}
+                      onChange={(e) => setPercent(Number(e.target.value))}
+                      required
+                    />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Max uses (0 = unlimited)</label>
-                    <input type="number" min={0} className="form-control" value={maxUses} onChange={(e) => setMaxUses(e.target.value)} />
+                    <label className="form-label" style={{ color: "#000" }}>Max uses (0 = unlimited)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="form-control"
+                      value={maxUses}
+                      onChange={(e) => setMaxUses(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div>
-                  <label className="form-label">Expires at (optional)</label>
-                  <input type="datetime-local" className="form-control" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+                  <label className="form-label" style={{ color: "#000" }}>Expires at (optional)</label>
+                  <input
+                    type="datetime-local"
+                    className="form-control"
+                    value={expiresAt}
+                    onChange={(e) => setExpiresAt(e.target.value)}
+                  />
                 </div>
-                <button className="btn btn-danger" disabled={disabled || loading}>{loading ? "Saving…" : "Save coupon"}</button>
+                <button className="mono-btn" disabled={disabled || loading} type="submit">
+                  {loading ? "Saving…" : "Save coupon"}
+                </button>
               </form>
             </div>
           </div>
         </div>
 
         <div className="col-12 col-lg-7">
-          <div className="card border-0 shadow-sm rounded-4">
+          <div className="card border-0 shadow-sm rounded-4" style={{ background: "#fff", color: "#000" }}>
             <div className="card-body">
-              <h6 className="fw-semibold mb-3">All coupons</h6>
+              <h6 className="fw-semibold mb-3" style={{ color: "#000" }}>All coupons</h6>
               {list.length === 0 ? (
-                <div className="text-muted">No coupons yet</div>
+                <div className="small" style={{ color: "#000" }}>No coupons yet</div>
               ) : (
                 <div className="table-responsive">
                   <table className="table align-middle">
                     <thead>
                       <tr>
-                        <th>Code</th>
-                        <th>Percent</th>
-                        <th>Uses</th>
-                        <th>Max</th>
-                        <th>Status</th>
-                        <th>Expires</th>
-                        <th>Actions</th>
+                        <th style={{ color: "#000" }}>Code</th>
+                        <th style={{ color: "#000" }}>Percent</th>
+                        <th style={{ color: "#000" }}>Uses</th>
+                        <th style={{ color: "#000" }}>Max</th>
+                        <th style={{ color: "#000" }}>Status</th>
+                        <th style={{ color: "#000" }}>Expires</th>
+                        <th style={{ color: "#000" }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {list.map((c) => (
                         <tr key={c._id}>
-                          <td className="fw-semibold">{c.code}</td>
-                          <td>{c.percent}%</td>
-                          <td>{c.uses || 0}</td>
-                          <td>{c.maxUses === 0 ? "∞" : c.maxUses}</td>
+                          <td className="fw-semibold" style={{ color: "#000" }}>{c.code}</td>
+                          <td style={{ color: "#000" }}>{c.percent}%</td>
+                          <td style={{ color: "#000" }}>{c.uses || 0}</td>
+                          <td style={{ color: "#000" }}>{c.maxUses === 0 ? "∞" : c.maxUses}</td>
                           <td>
-                            {c.active ? <span className="badge bg-success">Active</span> : <span className="badge bg-secondary">Inactive</span>}
+                            <span className={`mono-badge ${c.active ? "active" : ""}`}>
+                              {c.active ? "Active" : "Inactive"}
+                            </span>
                           </td>
-                          <td>{c.expiresAt ? new Date(c.expiresAt).toLocaleString() : "—"}</td>
+                          <td style={{ color: "#000" }}>{c.expiresAt ? new Date(c.expiresAt).toLocaleString() : "—"}</td>
                           <td className="d-flex gap-2">
-                            <button className="btn btn-sm btn-outline-primary" title="Edit" onClick={() => openEdit(c)}>
+                            <button className="mono-btn mono-btn-sm" title="Edit" type="button" onClick={() => openEdit(c)}>
                               <Pencil size={16} />
                             </button>
                             {c.active ? (
-                              <button className="btn btn-sm btn-outline-warning" title="Deactivate" onClick={() => toggleActive(c._id, false)}>
+                              <button className="mono-btn mono-btn-sm" title="Deactivate" type="button" onClick={() => toggleActive(c._id, false)}>
                                 <PowerOff size={16} />
                               </button>
                             ) : (
-                              <button className="btn btn-sm btn-outline-success" title="Activate" onClick={() => toggleActive(c._id, true)}>
+                              <button className="mono-btn mono-btn-sm" title="Activate" type="button" onClick={() => toggleActive(c._id, true)}>
                                 <Power size={16} />
                               </button>
                             )}
-                            <button className="btn btn-sm btn-outline-danger" title="Delete" onClick={() => del(c._id)}>
+                            <button className="mono-btn mono-btn-sm" title="Delete" type="button" onClick={() => del(c._id)}>
                               <Trash2 size={16} />
                             </button>
                           </td>
@@ -212,45 +250,123 @@ export default function CouponsPage() {
       {editing && (
         <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,.4)" }} onClick={() => setEditing(null)}>
           <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-content">
+            <div className="modal-content" style={{ background: "#fff", color: "#000" }}>
               <div className="modal-header">
-                <h5 className="modal-title">Edit coupon</h5>
-                <button type="button" className="btn btn-sm btn-light" onClick={() => setEditing(null)}><X size={16} /></button>
+                <h5 className="modal-title" style={{ color: "#000" }}>Edit coupon</h5>
+                <button type="button" className="mono-btn mono-btn-sm" onClick={() => setEditing(null)} aria-label="Close">
+                  <X size={16} />
+                </button>
               </div>
               <form onSubmit={saveEdit}>
                 <div className="modal-body vstack gap-3">
                   <div>
-                    <label className="form-label">Code</label>
-                    <input className="form-control" value={editData.code} onChange={(e) => setEditData({ ...editData, code: e.target.value.toUpperCase() })} required />
+                    <label className="form-label" style={{ color: "#000" }}>Code</label>
+                    <input
+                      className="form-control"
+                      value={editData.code}
+                      onChange={(e) => setEditData({ ...editData, code: e.target.value.toUpperCase() })}
+                      required
+                    />
                   </div>
                   <div className="row g-3">
                     <div className="col-md-6">
-                      <label className="form-label">Percent</label>
-                      <input type="number" min={1} max={100} className="form-control" value={editData.percent} onChange={(e) => setEditData({ ...editData, percent: Number(e.target.value) })} required />
+                      <label className="form-label" style={{ color: "#000" }}>Percent</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={100}
+                        className="form-control"
+                        value={editData.percent}
+                        onChange={(e) => setEditData({ ...editData, percent: Number(e.target.value) })}
+                        required
+                      />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label">Max uses</label>
-                      <input type="number" min={0} className="form-control" value={editData.maxUses} onChange={(e) => setEditData({ ...editData, maxUses: e.target.value })} />
+                      <label className="form-label" style={{ color: "#000" }}>Max uses</label>
+                      <input
+                        type="number"
+                        min={0}
+                        className="form-control"
+                        value={editData.maxUses}
+                        onChange={(e) => setEditData({ ...editData, maxUses: e.target.value })}
+                      />
                     </div>
                   </div>
                   <div>
-                    <label className="form-label">Expires at</label>
-                    <input type="datetime-local" className="form-control" value={editData.expiresAt} onChange={(e) => setEditData({ ...editData, expiresAt: e.target.value })} />
+                    <label className="form-label" style={{ color: "#000" }}>Expires at</label>
+                    <input
+                      type="datetime-local"
+                      className="form-control"
+                      value={editData.expiresAt}
+                      onChange={(e) => setEditData({ ...editData, expiresAt: e.target.value })}
+                    />
                   </div>
                   <div className="form-check">
-                    <input id="editActive" className="form-check-input" type="checkbox" checked={editData.active} onChange={(e) => setEditData({ ...editData, active: e.target.checked })} />
-                    <label htmlFor="editActive" className="form-check-label">Active</label>
+                    <input
+                      id="editActive"
+                      className="form-check-input"
+                      type="checkbox"
+                      checked={editData.active}
+                      onChange={(e) => setEditData({ ...editData, active: e.target.checked })}
+                      style={{ accentColor: "#000" }}
+                    />
+                    <label htmlFor="editActive" className="form-check-label" style={{ color: "#000" }}>Active</label>
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-light" onClick={() => setEditing(null)}>Cancel</button>
-                  <button type="submit" className="btn btn-danger">Save</button>
+                  <button type="button" className="mono-btn mono-btn-sm" onClick={() => setEditing(null)}>Cancel</button>
+                  <button type="submit" className="mono-btn mono-btn-sm">Save</button>
                 </div>
               </form>
             </div>
           </div>
         </div>
       )}
+
+      {/* Local monochrome + focus-visible */}
+      <style>{`
+        /* Inputs/selects focus in black */
+        .form-control:focus, .form-select:focus {
+          border-color: #000 !important;
+          box-shadow: none !important;
+        }
+
+        /* Mono buttons */
+        .mono-btn {
+          border: 1px solid #000; background: #fff; color: #000;
+          border-radius: 10px; padding: 8px 12px; font-weight: 700;
+          transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .12s ease;
+          white-space: nowrap;
+        }
+        .mono-btn-sm { padding: 6px 10px; border-radius: 999px; }
+        .mono-btn:hover { background: #000; color: #fff; }
+        .mono-btn:active { transform: scale(0.98); }
+
+        /* Mono badge */
+        .mono-badge {
+          display: inline-block; padding: 4px 10px; border-radius: 999px;
+          border: 1px solid #000; background: #fff; color: #000; font-weight: 700;
+        }
+        .mono-badge.active { background: #000; color: #fff; }
+
+        /* Keyboard-only focus indicator */
+        .mono-btn:focus-visible,
+        a:focus-visible,
+        .form-control:focus-visible,
+        .form-select:focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff;
+        }
+        .mono-btn:focus, a:focus, .form-control:focus, .form-select:focus {
+          outline: 2px solid #000; outline-offset: 2px;
+        }
+        .mono-btn:focus:not(:focus-visible),
+        a:focus:not(:focus-visible),
+        .form-control:focus:not(:focus-visible),
+        .form-select:focus:not(:focus-visible) {
+          outline: none; box-shadow: none;
+        }
+      `}</style>
     </div>
   );
 }

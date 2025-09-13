@@ -1,4 +1,4 @@
-// admin/src/pages/AdminLogin.jsx
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
@@ -81,53 +81,47 @@ const AdminLogin = () => {
   return (
     <div
       className="d-flex align-items-center justify-content-center"
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg,#fdf2f8,#fff7ed)"
-      }}
+      style={{ minHeight: "100vh", background: "#f1efef" }}
     >
       <ToastContainer position="top-right" autoClose={2000} newestOnTop />
       <div className="container" style={{ maxWidth: 480 }}>
-        <div className="card border-0 shadow rounded-4">
+        <div className="card border-0 shadow rounded-4" style={{ background: "#fff", color: "#000" }}>
           <div className="card-body p-4 p-md-5">
             <div className="d-flex align-items-center gap-2 mb-3">
               <div
                 className="rounded-circle d-flex align-items-center justify-content-center"
-                style={{
-                  width: 48,
-                  height: 48,
-                  background: "linear-gradient(135deg,#fb7185,#f59f0b)"
-                }}
+                style={{ width: 48, height: 48, background: "#fff", color: "#000", border: "2px solid #000" }}
+                aria-hidden="true"
               >
-                <span className="text-white fw-bold">A</span>
+                <span className="fw-bold">A</span>
               </div>
               <div className="lh-1">
-                <div className="fw-bold">Admin</div>
-                <small className="text-muted">Dashboard Access</small>
+                <div className="fw-bold" style={{ color: "#000" }}>Admin</div>
+                <small style={{ color: "#000" }}>Dashboard Access</small>
               </div>
             </div>
 
-            <h1 className="h4 fw-bold mb-2">Sign in</h1>
-            <p className="text-muted mb-2">
+            <h1 className="h4 fw-bold mb-2" style={{ color: "#000" }}>Sign in</h1>
+            <p className="mb-2" style={{ color: "#000" }}>
               Enter admin credentials to continue to dashboard.{" "}
               <Link to="/" className="text-decoration-none">Back to site</Link>
             </p>
-            <p className="text-muted mb-4">
+            <p className="mb-4" style={{ color: "#000" }}>
               New admin?{" "}
               <Link to="/admin/register" className="text-decoration-none">Create admin</Link>
             </p>
 
             {formError && (
-              <div className="alert alert-danger py-2">{formError}</div>
+              <div className="mono-alert py-2">{formError}</div>
             )}
 
             <form onSubmit={onSubmit} noValidate>
               {/* Email */}
               <div className="mb-3">
-                <label className="form-label fw-semibold small">Email</label>
+                <label className="form-label fw-semibold small" style={{ color: "#000" }}>Email</label>
                 <div className="input-group">
-                  <span className="input-group-text bg-white">
-                    <Mail size={18} className="text-secondary" />
+                  <span className="input-group-text" style={{ background: "#fff", color: "#000", borderColor: "#000" }}>
+                    <Mail size={18} />
                   </span>
                   <input
                     type="email"
@@ -137,16 +131,17 @@ const AdminLogin = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     autoComplete="email"
                     required
+                    style={{ color: "#000", borderColor: "#000" }}
                   />
                 </div>
               </div>
 
               {/* Password */}
               <div className="mb-3">
-                <label className="form-label fw-semibold small">Password</label>
+                <label className="form-label fw-semibold small" style={{ color: "#000" }}>Password</label>
                 <div className="input-group">
-                  <span className="input-group-text bg-white">
-                    <Lock size={18} className="text-secondary" />
+                  <span className="input-group-text" style={{ background: "#fff", color: "#000", borderColor: "#000" }}>
+                    <Lock size={18} />
                   </span>
                   <input
                     type={showPw ? "text" : "password"}
@@ -156,10 +151,11 @@ const AdminLogin = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="current-password"
                     required
+                    style={{ color: "#000", borderColor: "#000" }}
                   />
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="mono-btn mono-btn-sm"
                     onClick={() => setShowPw((v) => !v)}
                     aria-label={showPw ? "Hide password" : "Show password"}
                   >
@@ -177,13 +173,14 @@ const AdminLogin = () => {
                     type="checkbox"
                     checked={remember}
                     onChange={(e) => setRemember(e.target.checked)}
+                    style={{ accentColor: "#000" }}
                   />
-                  <label htmlFor="remember" className="form-check-label small">
+                  <label htmlFor="remember" className="form-check-label small" style={{ color: "#000" }}>
                     Remember me
                   </label>
                 </div>
 
-                <span className="small text-muted">Forgot password?</span>
+                <span className="small" style={{ color: "#000" }}>Forgot password?</span>
               </div>
 
               {/* Submit */}
@@ -191,7 +188,7 @@ const AdminLogin = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="btn btn-danger rounded-4 d-inline-flex align-items-center justify-content-center gap-2 py-2"
+                  className="mono-btn rounded-4 d-inline-flex align-items-center justify-content-center gap-2 py-2"
                 >
                   {submitting ? (
                     <>
@@ -211,13 +208,50 @@ const AdminLogin = () => {
                 </button>
               </div>
             </form>
-
-            <p className="small text-muted mt-4 mb-0">
-              Session cookies are required for admin access.
-            </p>
           </div>
         </div>
       </div>
+
+      {/* Local monochrome + focus-visible */}
+      <style>{`
+        /* Inputs/selects focus in black */
+        .form-control:focus {
+          border-color: #000 !important;
+          box-shadow: none !important;
+        }
+
+        /* Monochrome alert for errors */
+        .mono-alert {
+          border: 1px solid #000;
+          background: #fff;
+          color: #000;
+          border-radius: 10px;
+          padding: 8px 12px;
+        }
+
+        /* Mono buttons */
+        .mono-btn {
+          border: 1px solid #000; background: #fff; color: #000;
+          border-radius: 10px; padding: 8px 12px; font-weight: 700;
+          transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .12s ease;
+          white-space: nowrap;
+        }
+        .mono-btn-sm { padding: 6px 10px; border-radius: 999px; }
+        .mono-btn:hover { background: #000; color: #fff; }
+        .mono-btn:active { transform: scale(0.98); }
+
+        /* Keyboard-only focus indicator */
+        .mono-btn:focus-visible,
+        a:focus-visible,
+        .form-control:focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff;
+        }
+        .mono-btn:focus, a:focus, .form-control:focus { outline: 2px solid #000; outline-offset: 2px; }
+        .mono-btn:focus:not(:focus-visible),
+        a:focus:not(:focus-visible),
+        .form-control:focus:not(:focus-visible) { outline: none; box-shadow: none; }
+      `}</style>
     </div>
   );
 };

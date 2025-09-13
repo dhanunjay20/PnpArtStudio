@@ -1,4 +1,4 @@
-// admin/src/pages/ClassesPage.jsx
+
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Edit, Trash2, Image as ImageIcon, DollarSign, Calendar, Users, Plus } from "lucide-react";
@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import "./admin.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
-const CLASSES_URL = `${API_BASE}/api/classes`; // must match server mount /api + /classes [1][2]
+const CLASSES_URL = `${API_BASE}/api/classes`;
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -40,12 +40,15 @@ const mapClassFromApi = (doc) => ({
   cover: doc.cover || "",
   description: doc.description || "",
   published: !!doc.published
-}); // aligns with backend JSON doc fields [1]
+});
+
+// USD formatter
+const fmtUSD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 async function uploadToCloudinary(file, folder = "pnpart/ecommerce/classes") {
   if (!CLOUD_NAME || !UPLOAD_PRESET) {
     throw new Error("Cloudinary env missing (VITE_CLOUDINARY_CLOUD_NAME, VITE_CLOUDINARY_UPLOAD_PRESET)");
-  } // preset must exist for unsigned uploads [3][4]
+  }
   const fd = new FormData();
   fd.append("file", file);
   fd.append("upload_preset", UPLOAD_PRESET);
@@ -54,9 +57,9 @@ async function uploadToCloudinary(file, folder = "pnpart/ecommerce/classes") {
   const data = await res.json();
   if (!res.ok || !data.secure_url) {
     throw new Error(data?.error?.message || "Cloudinary upload failed");
-  } // handle Cloudinary API response correctly [3]
+  }
   return { url: data.secure_url, publicId: data.public_id };
-} // unsigned upload: file + upload_preset (+ folder if preset allows) [4]
+}
 
 export default function ClassesPage() {
   const [items, setItems] = useState([]);
@@ -81,7 +84,7 @@ export default function ClassesPage() {
     } finally {
       setLoading(false);
     }
-  }; // GET /api/classes -> { items } [1]
+  };
 
   useEffect(() => { load(); }, []);
 
@@ -105,14 +108,14 @@ export default function ClassesPage() {
     } finally {
       setUploadingCover(false);
     }
-  }; // stores single cover URL as string to match backend schema [3]
+  };
 
   const resetForm = () => {
     setForm(EMPTY_CLASS);
     setEditingId("");
     setCoverPreview("");
     if (fileRef.current) fileRef.current.value = "";
-  }; // simple form reset on success [1]
+  };
 
   const saveClass = async (e) => {
     e?.preventDefault?.();
@@ -130,13 +133,13 @@ export default function ClassesPage() {
         cover: form.cover,
         description: form.description || "",
         published: !!form.published
-      }; // JSON body matches backend router expectations [1]
+      };
 
       if (editingId) {
         const res = await axios.put(`${CLASSES_URL}/${editingId}`, payload, {
           withCredentials: true,
           headers: { "Content-Type": "application/json" }
-        }); // PUT /api/classes/:id [1]
+        });
         const updated = mapClassFromApi(res.data);
         setItems((arr) => arr.map((it) => (it.id === editingId ? updated : it)));
         toast.success("Class updated");
@@ -144,7 +147,7 @@ export default function ClassesPage() {
         const res = await axios.post(CLASSES_URL, payload, {
           withCredentials: true,
           headers: { "Content-Type": "application/json" }
-        }); // POST /api/classes [1]
+        });
         const created = mapClassFromApi(res.data);
         setItems((arr) => [created, ...arr]);
         toast.success("Class created");
@@ -154,7 +157,7 @@ export default function ClassesPage() {
       console.error(e);
       toast.error(e?.response?.status === 404 ? "Route not found (/api/classes)" : "Failed to save class");
     }
-  }; // uses same endpoint base for create/update to match server routes [1]
+  };
 
   const editClass = (id) => {
     const found = items.find((c) => c.id === id);
@@ -163,12 +166,12 @@ export default function ClassesPage() {
     setForm({ ...found });
     setCoverPreview(found.cover || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }; // local fill for editing without extra GET [1]
+  };
 
   const deleteClass = async (id) => {
     if (!window.confirm("Delete this class?")) return;
     try {
-      await axios.delete(`${CLASSES_URL}/${id}`, { withCredentials: true }); // DELETE /api/classes/:id [1]
+      await axios.delete(`${CLASSES_URL}/${id}`, { withCredentials: true });
       setItems((arr) => arr.filter((c) => c.id !== id));
       if (editingId === id) resetForm();
       toast.success("Class deleted");
@@ -176,28 +179,35 @@ export default function ClassesPage() {
       console.error(e);
       toast.error(e?.response?.status === 404 ? "Route not found (/api/classes/:id)" : "Failed to delete class");
     }
-  }; // consistent DELETE path bound to server router [1]
+  };
 
   return (
     <div>
       <div className="d-flex align-items-center justify-content-between mb-3">
         <div>
-          <h1 className="h4 fw-bold mb-0">Art Classes</h1>
-          <small className="text-muted">Create and manage upcoming classes</small>
+          <h1 className="h4 fw-bold mb-0" style={{ color: "#000" }}>Art Classes</h1>
+          <small style={{ color: "#000" }}>Create and manage upcoming classes</small>
         </div>
-        {loading && <span className="text-muted small">Loading…</span>}
+        {loading && <span className="small" style={{ color: "#000" }}>Loading…</span>}
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card border-0 shadow-sm rounded-4 mb-4">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card border-0 shadow-sm rounded-4 mb-4"
+        style={{ background: "#fff", color: "#000" }}
+      >
         <div className="card-body p-3 p-lg-4">
           <div className="d-flex align-items-center justify-content-between">
-            <h2 className="h6 fw-semibold mb-3">{editingId ? "Edit Art Class" : "Add New Art Class"}</h2>
+            <h2 className="h6 fw-semibold mb-3" style={{ color: "#000" }}>
+              {editingId ? "Edit Art Class" : "Add New Art Class"}
+            </h2>
           </div>
 
           <form onSubmit={saveClass}>
             <div className="row g-3">
               <div className="col-12 col-sm-6 col-lg-6">
-                <label className="form-label small fw-semibold">Title</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>Title</label>
                 <input
                   className="form-control"
                   placeholder="e.g., Acrylic Basics Weekend"
@@ -208,7 +218,7 @@ export default function ClassesPage() {
               </div>
 
               <div className="col-6 col-sm-6 col-lg-3">
-                <label className="form-label small fw-semibold">Mode</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>Mode</label>
                 <select
                   className="form-select"
                   value={form.mode}
@@ -220,7 +230,9 @@ export default function ClassesPage() {
               </div>
 
               <div className="col-6 col-sm-6 col-lg-3">
-                <label className="form-label small fw-semibold"><Calendar size={14} className="me-1" />Start Date</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>
+                  <Calendar size={14} className="me-1" />Start Date
+                </label>
                 <input
                   type="date"
                   className="form-control"
@@ -231,7 +243,7 @@ export default function ClassesPage() {
               </div>
 
               <div className="col-6 col-sm-6 col-lg-3">
-                <label className="form-label small fw-semibold">Duration (weeks)</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>Duration (weeks)</label>
                 <input
                   type="number"
                   min="1"
@@ -242,7 +254,9 @@ export default function ClassesPage() {
               </div>
 
               <div className="col-6 col-sm-6 col-lg-3">
-                <label className="form-label small fw-semibold"><Users size={14} className="me-1" />Seats</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>
+                  <Users size={14} className="me-1" />Seats
+                </label>
                 <input
                   type="number"
                   min="1"
@@ -253,7 +267,9 @@ export default function ClassesPage() {
               </div>
 
               <div className="col-6 col-sm-6 col-lg-3">
-                <label className="form-label small fw-semibold"><DollarSign size={14} className="me-1" />Price</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>
+                  <DollarSign size={14} className="me-1" />Price
+                </label>
                 <input
                   type="number"
                   step="0.01"
@@ -265,7 +281,7 @@ export default function ClassesPage() {
               </div>
 
               <div className="col-6 col-sm-6 col-lg-3">
-                <label className="form-label small fw-semibold">Level</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>Level</label>
                 <select
                   className="form-select"
                   value={form.level}
@@ -279,7 +295,7 @@ export default function ClassesPage() {
 
               {/* Cover */}
               <div className="col-12">
-                <label className="form-label small fw-semibold d-block">Cover Image</label>
+                <label className="form-label small fw-semibold d-block" style={{ color: "#000" }}>Cover Image</label>
                 <div className="d-flex align-items-center gap-3 flex-wrap">
                   <label className="img-uploader m-0">
                     <input
@@ -297,27 +313,27 @@ export default function ClassesPage() {
                     <img
                       src={coverPreview || form.cover}
                       alt="cover preview"
-                      style={{ width: 96, height: 96, objectFit: "cover", borderRadius: 8 }}
+                      style={{ width: 96, height: 96, objectFit: "cover", borderRadius: 8, border: "1px solid #000" }}
                     />
                   )}
 
                   {(coverPreview || form.cover) && (
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline-secondary"
+                      className="mono-btn mono-btn-sm"
                       onClick={() => handleCoverFile(null)}
                     >
                       Remove
                     </button>
                   )}
                 </div>
-                <small className="text-muted d-block mt-1">
+                <small className="d-block mt-1" style={{ color: "#000" }}>
                   JPG/PNG/WEBP up to 10MB; uploaded to Cloudinary and saved by URL.
                 </small>
               </div>
 
               <div className="col-12">
-                <label className="form-label small fw-semibold">Description</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>Description</label>
                 <textarea
                   className="form-control"
                   rows={3}
@@ -328,7 +344,7 @@ export default function ClassesPage() {
               </div>
 
               <div className="col-12 col-sm-6 col-lg-3">
-                <label className="form-label small fw-semibold">Visibility</label>
+                <label className="form-label small fw-semibold" style={{ color: "#000" }}>Visibility</label>
                 <select
                   className="form-select"
                   value={form.published ? "published" : "draft"}
@@ -344,7 +360,7 @@ export default function ClassesPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="btn btn-danger d-inline-flex align-items-center justify-content-center gap-2"
+                  className="mono-btn d-inline-flex align-items-center justify-content-center gap-2"
                   disabled={uploadingCover}
                 >
                   {editingId ? <Edit size={18} /> : <Plus size={18} />}
@@ -352,7 +368,7 @@ export default function ClassesPage() {
                 </motion.button>
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="mono-btn mono-btn-outline"
                   onClick={resetForm}
                   disabled={uploadingCover}
                 >
@@ -364,20 +380,20 @@ export default function ClassesPage() {
         </div>
       </motion.div>
 
-      <div className="card border-0 shadow-sm rounded-4">
+      <div className="card border-0 shadow-sm rounded-4" style={{ background: "#fff", color: "#000" }}>
         <div className="card-body p-0">
           <div className="table-responsive-sm">
             <table className="table align-middle mb-0">
-              <thead className="table-light">
+              <thead>
                 <tr>
-                  <th style={{ width: 64 }}>Cover</th>
-                  <th>Title</th>
-                  <th className="d-none d-sm-table-cell">Mode</th>
-                  <th>Start</th>
-                  <th className="text-end d-none d-sm-table-cell">Seats</th>
-                  <th className="text-end d-none d-md-table-cell">Price</th>
-                  <th className="d-none d-md-table-cell">Status</th>
-                  <th style={{ width: 130 }} className="text-end">Actions</th>
+                  <th style={{ width: 64, borderBottom: "1px solid #000", color: "#000" }}>Cover</th>
+                  <th style={{ borderBottom: "1px solid #000", color: "#000" }}>Title</th>
+                  <th className="d-none d-sm-table-cell" style={{ borderBottom: "1px solid #000", color: "#000" }}>Mode</th>
+                  <th style={{ borderBottom: "1px solid #000", color: "#000" }}>Start</th>
+                  <th className="text-end d-none d-sm-table-cell" style={{ borderBottom: "1px solid #000", color: "#000" }}>Seats</th>
+                  <th className="text-end d-none d-md-table-cell" style={{ borderBottom: "1px solid #000", color: "#000" }}>Price</th>
+                  <th className="d-none d-md-table-cell" style={{ borderBottom: "1px solid #000", color: "#000" }}>Status</th>
+                  <th style={{ width: 130, borderBottom: "1px solid #000", color: "#000" }} className="text-end">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -391,30 +407,32 @@ export default function ClassesPage() {
                           <img
                             src={c.cover}
                             alt={c.title}
-                            style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8 }}
+                            style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, border: "1px solid #000" }}
                           />
                         ) : (
-                          <div className="bg-light d-flex align-items-center justify-content-center" style={{ width: 48, height: 48, borderRadius: 8 }}>
-                            <ImageIcon size={16} className="text-secondary" />
+                          <div className="d-flex align-items-center justify-content-center" style={{ width: 48, height: 48, borderRadius: 8, border: "1px solid #000" }}>
+                            <ImageIcon size={16} />
                           </div>
                         )}
                       </td>
-                      <td className="fw-semibold">{c.title}</td>
-                      <td className="d-none d-sm-table-cell">{c.mode}</td>
-                      <td>{c.startDate || "-"}</td>
-                      <td className="text-end d-none d-sm-table-cell">{c.seats}</td>
-                      <td className="text-end d-none d-md-table-cell">{price !== null ? `$${price.toFixed(2)}` : "-"}</td>
+                      <td className="fw-semibold" style={{ color: "#000" }}>{c.title}</td>
+                      <td className="d-none d-sm-table-cell" style={{ color: "#000" }}>{c.mode}</td>
+                      <td style={{ color: "#000" }}>{c.startDate || "-"}</td>
+                      <td className="text-end d-none d-sm-table-cell" style={{ color: "#000" }}>{c.seats}</td>
+                      <td className="text-end d-none d-md-table-cell" style={{ color: "#000" }}>
+                        {price !== null ? fmtUSD.format(price) : "-"}
+                      </td>
                       <td className="d-none d-md-table-cell">
-                        <span className={`badge ${c.published ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary"}`}>
+                        <span className={`mono-badge ${c.published ? "active" : ""}`}>
                           {c.published ? "Published" : "Draft"}
                         </span>
                       </td>
                       <td className="text-end">
-                        <div className="btn-group btn-group-sm">
-                          <button className="btn btn-outline-secondary" onClick={() => editClass(c.id)}>
+                        <div className="d-inline-flex gap-1">
+                          <button className="mono-btn mono-btn-sm" onClick={() => editClass(c.id)}>
                             <Edit size={16} />
                           </button>
-                          <button className="btn btn-outline-danger" onClick={() => deleteClass(c.id)}>
+                          <button className="mono-btn mono-btn-sm" onClick={() => deleteClass(c.id)}>
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -424,7 +442,7 @@ export default function ClassesPage() {
                 })}
                 {items.length === 0 && !loading && (
                   <tr>
-                    <td colSpan={8} className="text-center text-muted py-4">No classes yet.</td>
+                    <td colSpan={8} className="text-center py-4" style={{ color: "#000" }}>No classes yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -432,6 +450,60 @@ export default function ClassesPage() {
           </div>
         </div>
       </div>
+
+      {/* Local monochrome + focus-visible */}
+      <style>{`
+        /* Inputs/selects focus in black; checkboxes/radios can use accent-color */
+        .form-control:focus, .form-select:focus {
+          border-color: #000 !important;
+          box-shadow: none !important;
+        }
+        .form-check-input { accent-color: #000; }
+
+        /* Mono buttons */
+        .mono-btn {
+          border: 1px solid #000; background: #fff; color: #000;
+          border-radius: 10px; padding: 8px 12px; font-weight: 700;
+          transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .12s ease;
+          white-space: nowrap;
+        }
+        .mono-btn:hover { background: #000; color: #fff; }
+        .mono-btn:active { transform: scale(0.98); }
+        .mono-btn-sm { padding: 6px 10px; border-radius: 999px; }
+
+        /* Outline variant */
+        .mono-btn-outline {
+          background: #fff; color: #000; border: 1px solid #000;
+        }
+        .mono-btn-outline:hover { background: #000; color: #fff; }
+
+        /* Keyboard-only focus ring */
+        .mono-btn:focus-visible,
+        a:focus-visible,
+        .form-control:focus-visible,
+        .form-select:focus-visible,
+        .img-uploader:focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff;
+        }
+        .mono-btn:focus, a:focus, .form-control:focus, .form-select:focus, .img-uploader:focus {
+          outline: 2px solid #000; outline-offset: 2px;
+        }
+        .mono-btn:focus:not(:focus-visible),
+        a:focus:not(:focus-visible),
+        .form-control:focus:not(:focus-visible),
+        .form-select:focus:not(:focus-visible),
+        .img-uploader:focus:not(:focus-visible) {
+          outline: none; box-shadow: none;
+        }
+
+        /* Mono badge for status */
+        .mono-badge {
+          display: inline-block; padding: 4px 10px; border-radius: 999px;
+          border: 1px solid #000; background: #fff; color: #000; font-weight: 700;
+        }
+        .mono-badge.active { background: #000; color: #fff; }
+      `}</style>
     </div>
   );
 }

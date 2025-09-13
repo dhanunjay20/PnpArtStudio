@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Image as ImageIcon, Trash2, Plus, Pencil, Save, X, Upload } from "lucide-react";
 import axios from "axios";
@@ -27,8 +28,8 @@ async function uploadToCloudinary(file, folder = "pnpart/gallery") {
 const categories = ["Paintings", "Handcrafted Items", "Exhibitions", "Other"];
 const fallbackImg = `data:image/svg+xml;charset=UTF-8,` + encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">
-     <rect width="100%" height="100%" fill="#f3f4f6"/>
-     <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-size="16" font-family="Arial">
+     <rect width="100%" height="100%" fill="#f6f6f6"/>
+     <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#999999" font-size="16" font-family="Arial">
        Image
      </text>
    </svg>`
@@ -71,7 +72,7 @@ export default function GalleryPage() {
     };
     document.addEventListener("keydown", onEsc);
     return () => document.removeEventListener("keydown", onEsc);
-  }, [addOpen, editOpen]); // accessible escape-to-close [16]
+  }, [addOpen, editOpen]);
 
   const load = async () => {
     try {
@@ -226,12 +227,11 @@ export default function GalleryPage() {
     <div>
       <div className="d-flex align-items-center justify-content-between mb-3">
         <div>
-          <h1 className="h4 fw-bold mb-0">Gallery</h1>
-          <small className="text-muted">Upload and manage images shown on the public gallery</small>
+          <h1 className="h4 fw-bold mb-0" style={{ color: "#000" }}>Gallery</h1>
+          <small style={{ color: "#000" }}>Upload and manage images shown on the public gallery</small>
         </div>
-        <button type="button" className="btn btn-danger d-inline-flex align-items-center gap-2" onClick={openAdd}>
-          <Plus size={18} />
-          {loading ? "Working…" : "Add item"}
+        <button type="button" className="mono-btn d-inline-flex align-items-center gap-2" onClick={openAdd} disabled={loading}>
+          <Plus size={18} /> {loading ? "Working…" : "Add item"}
         </button>
       </div>
 
@@ -241,27 +241,31 @@ export default function GalleryPage() {
           const key = g._id || g.src || g.url || i;
           const src = g.src || g.url || fallbackImg;
           return (
-            <div className="img-tile position-relative" key={key} style={{ width: 170, height: 170, borderRadius: 12, overflow: "hidden", background: "#f8f9fa" }}>
+            <div
+              className="position-relative"
+              key={key}
+              style={{ width: 170, height: 170, borderRadius: 12, overflow: "hidden", background: "#fff", border: "1px solid #000" }}
+            >
               <img
                 src={src}
                 alt={g.title || `gallery-${i}`}
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 onError={(e) => { e.currentTarget.src = fallbackImg; }}
               />
-              <div className="tile-actions position-absolute top-0 end-0 m-2 d-flex gap-1">
-                <button type="button" className="btn btn-sm btn-light" title="Edit" onClick={() => startEdit(g)}>
+              <div className="position-absolute top-0 end-0 m-2 d-flex gap-1">
+                <button type="button" className="mono-btn mono-btn-sm" title="Edit" onClick={() => startEdit(g)}>
                   <Pencil size={16} />
                 </button>
-                <button type="button" className="btn btn-sm btn-danger" title="Delete" onClick={() => removeAt(g._id)}>
+                <button type="button" className="mono-btn mono-btn-sm" title="Delete" onClick={() => removeAt(g._id)}>
                   <Trash2 size={16} />
                 </button>
               </div>
-              <span className="badge bg-light text-dark position-absolute bottom-0 start-0 m-2">{g.category || "—"}</span>
+              <span className="mono-badge position-absolute bottom-0 start-0 m-2">{g.category || "—"}</span>
             </div>
           );
         })}
         {items.length === 0 && !loading && (
-          <div className="text-muted small d-flex align-items-center gap-2">
+          <div className="small d-flex align-items-center gap-2" style={{ color: "#000" }}>
             <ImageIcon size={16} /> No images yet.
           </div>
         )}
@@ -279,11 +283,11 @@ export default function GalleryPage() {
             aria-modal="true"
           >
             <div className="modal-dialog modal-md modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-content position-relative">
+              <div className="modal-content position-relative" style={{ background: "#fff", color: "#000" }}>
                 <button
                   type="button"
                   aria-label="Close"
-                  className="btn btn-sm btn-light btn-modal-close"
+                  className="mono-btn mono-btn-sm btn-modal-close"
                   style={{ top: 8, right: 8, position: 'absolute', cursor: 'pointer', zIndex: 2, pointerEvents: 'auto' }}
                   onClick={() => setAddOpen(false)}
                   title="Close"
@@ -291,47 +295,49 @@ export default function GalleryPage() {
                   <X size={16} />
                 </button>
                 <div className="modal-body p-4">
-                  <h2 className="h5 fw-bold mb-3">Add Gallery Item</h2>
+                  <h2 className="h5 fw-bold mb-3" style={{ color: "#000" }}>Add Gallery Item</h2>
                   <div className="vstack gap-3">
                     <div className="row g-3">
                       <div className="col-12">
-                        <label className="form-label small fw-semibold">Title</label>
+                        <label className="form-label small fw-semibold" style={{ color: "#000" }}>Title</label>
                         <input className="form-control" value={addForm.title} onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))} />
                       </div>
                       <div className="col-6">
-                        <label className="form-label small fw-semibold">Category</label>
+                        <label className="form-label small fw-semibold" style={{ color: "#000" }}>Category</label>
                         <select className="form-select" value={addForm.category} onChange={(e) => setAddForm((f) => ({ ...f, category: e.target.value }))}>
                           {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                         </select>
                       </div>
                       <div className="col-6">
-                        <label className="form-label small fw-semibold">Year</label>
+                        <label className="form-label small fw-semibold" style={{ color: "#000" }}>Year</label>
                         <input type="number" className="form-control" value={addForm.year} onChange={(e) => setAddForm((f) => ({ ...f, year: Number(e.target.value || new Date().getFullYear()) }))} />
                       </div>
                     </div>
                     <div>
-                      <label className="form-label small fw-semibold">Medium</label>
+                      <label className="form-label small fw-semibold" style={{ color: "#000" }}>Medium</label>
                       <input className="form-control" value={addForm.medium} onChange={(e) => setAddForm((f) => ({ ...f, medium: e.target.value }))} />
                     </div>
                     <div>
-                      <label className="form-label small fw-semibold">Description</label>
+                      <label className="form-label small fw-semibold" style={{ color: "#000" }}>Description</label>
                       <textarea className="form-control" rows={4} value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} />
                     </div>
                     <div>
-                      <label className="form-label small fw-semibold">Image</label>
-                      <div className="border rounded-3 p-3 d-flex align-items-center justify-content-between">
-                        <input type="file" accept="image/*" onChange={(e) => setAddForm((f) => ({ ...f, file: e.target.files?. [0] || null }))} />
-                        <div className="text-muted small d-flex align-items-center gap-2">
+                      <label className="form-label small fw-semibold" style={{ color: "#000" }}>Image</label>
+                      <div className="border rounded-3 p-3 d-flex align-items-center justify-content-between" style={{ borderColor: "#000" }}>
+                        <input type="file" accept="image/*" onChange={(e) => setAddForm((f) => ({ ...f, file: e.target.files?.[0] || null }))} />
+                        <div className="small d-flex align-items-center gap-2" style={{ color: "#000" }}>
                           <Upload size={16} /> {addForm.file ? addForm.file.name : "Select an image"}
                         </div>
                       </div>
                     </div>
                     <div className="d-flex justify-content-end">
-                      <button type="button" className="btn btn-danger d-inline-flex align-items-center gap-2" onClick={submitAdd} disabled={loading}>
+                      <button type="button" className="mono-btn d-inline-flex align-items-center gap-2" onClick={submitAdd} disabled={loading}>
                         <Save size={16} /> {loading ? "Saving…" : "Add item"}
                       </button>
                     </div>
-                    <small className="text-muted">The image is uploaded first, then all form details are saved to the database.</small>
+                    <small className="small" style={{ color: "#000" }}>
+                      The image is uploaded first, then all form details are saved to the database.
+                    </small>
                   </div>
                 </div>
               </div>
@@ -352,11 +358,11 @@ export default function GalleryPage() {
             aria-modal="true"
           >
             <div className="modal-dialog modal-md modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-content position-relative">
+              <div className="modal-content position-relative" style={{ background: "#fff", color: "#000" }}>
                 <button
                   type="button"
                   aria-label="Close"
-                  className="btn btn-sm btn-light btn-modal-close"
+                  className="mono-btn mono-btn-sm btn-modal-close"
                   style={{ top: 8, right: 8, position: 'absolute', cursor: 'pointer', zIndex: 2, pointerEvents: 'auto' }}
                   onClick={() => setEditOpen(false)}
                   title="Close"
@@ -364,47 +370,49 @@ export default function GalleryPage() {
                   <X size={16} />
                 </button>
                 <div className="modal-body p-4">
-                  <h2 className="h5 fw-bold mb-3">Edit Gallery Item</h2>
+                  <h2 className="h5 fw-bold mb-3" style={{ color: "#000" }}>Edit Gallery Item</h2>
                   <div className="vstack gap-3">
                     <div className="row g-3">
                       <div className="col-12">
-                        <label className="form-label small fw-semibold">Title</label>
+                        <label className="form-label small fw-semibold" style={{ color: "#000" }}>Title</label>
                         <input className="form-control" value={editForm.title} onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))} />
                       </div>
                       <div className="col-6">
-                        <label className="form-label small fw-semibold">Category</label>
+                        <label className="form-label small fw-semibold" style={{ color: "#000" }}>Category</label>
                         <select className="form-select" value={editForm.category} onChange={(e) => setEditForm((f) => ({ ...f, category: e.target.value }))}>
                           {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                         </select>
                       </div>
                       <div className="col-6">
-                        <label className="form-label small fw-semibold">Year</label>
+                        <label className="form-label small fw-semibold" style={{ color: "#000" }}>Year</label>
                         <input type="number" className="form-control" value={editForm.year} onChange={(e) => setEditForm((f) => ({ ...f, year: Number(e.target.value || new Date().getFullYear()) }))} />
                       </div>
                     </div>
                     <div>
-                      <label className="form-label small fw-semibold">Medium</label>
+                      <label className="form-label small fw-semibold" style={{ color: "#000" }}>Medium</label>
                       <input className="form-control" value={editForm.medium} onChange={(e) => setEditForm((f) => ({ ...f, medium: e.target.value }))} />
                     </div>
                     <div>
-                      <label className="form-label small fw-semibold">Description</label>
+                      <label className="form-label small fw-semibold" style={{ color: "#000" }}>Description</label>
                       <textarea className="form-control" rows={4} value={editForm.description} onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))} />
                     </div>
                     <div>
-                      <label className="form-label small fw-semibold">Replace Image (optional)</label>
-                      <div className="border rounded-3 p-3 d-flex align-items-center justify-content-between">
-                        <input type="file" accept="image/*" onChange={(e) => setEditForm((f) => ({ ...f, replaceFile: e.target.files?. [0] || null }))} />
-                        <div className="text-muted small d-flex align-items-center gap-2">
+                      <label className="form-label small fw-semibold" style={{ color: "#000" }}>Replace Image (optional)</label>
+                      <div className="border rounded-3 p-3 d-flex align-items-center justify-content-between" style={{ borderColor: "#000" }}>
+                        <input type="file" accept="image/*" onChange={(e) => setEditForm((f) => ({ ...f, replaceFile: e.target.files?.[0] || null }))} />
+                        <div className="small d-flex align-items-center gap-2" style={{ color: "#000" }}>
                           <Upload size={16} /> {editForm.replaceFile ? editForm.replaceFile.name : "Choose new image"}
                         </div>
                       </div>
                     </div>
                     <div className="d-flex justify-content-end">
-                      <button type="button" className="btn btn-danger d-inline-flex align-items-center gap-2" onClick={saveEdit} disabled={loading}>
+                      <button type="button" className="mono-btn d-inline-flex align-items-center gap-2" onClick={saveEdit} disabled={loading}>
                         <Save size={16} /> {loading ? "Saving…" : "Save changes"}
                       </button>
                     </div>
-                    <small className="text-muted">If you choose a new image, it uploads first, then the item is updated with the new URL and metadata.</small>
+                    <small className="small" style={{ color: "#000" }}>
+                      If you choose a new image, it uploads first, then the item is updated with the new URL and metadata.
+                    </small>
                   </div>
                 </div>
               </div>
@@ -413,9 +421,50 @@ export default function GalleryPage() {
         </>
       )}
 
-      {/* Ensure pointer cursor on close icons in case global CSS overrides */}
+      {/* Ensure pointer cursor on close icons and apply monochrome helpers */}
       <style>{`
         .btn-modal-close { cursor: pointer; }
+
+        /* Inputs/selects focus in black */
+        .form-control:focus, .form-select:focus {
+          border-color: #000 !important;
+          box-shadow: none !important;
+        }
+
+        /* Mono buttons */
+        .mono-btn {
+          border: 1px solid #000; background: #fff; color: #000;
+          border-radius: 10px; padding: 8px 12px; font-weight: 700;
+          transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .12s ease;
+          white-space: nowrap;
+        }
+        .mono-btn:hover { background: #000; color: #fff; }
+        .mono-btn:active { transform: scale(0.98); }
+        .mono-btn-sm { padding: 6px 10px; border-radius: 999px; }
+
+        /* Mono badge */
+        .mono-badge {
+          display: inline-block; padding: 4px 10px; border-radius: 999px;
+          border: 1px solid #000; background: #fff; color: #000; font-weight: 700;
+        }
+
+        /* Keyboard-only focus indicator */
+        .mono-btn:focus-visible,
+        a:focus-visible,
+        .form-control:focus-visible,
+        .form-select:focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff;
+        }
+        .mono-btn:focus, a:focus, .form-control:focus, .form-select:focus {
+          outline: 2px solid #000; outline-offset: 2px;
+        }
+        .mono-btn:focus:not(:focus-visible),
+        a:focus:not(:focus-visible),
+        .form-control:focus:not(:focus-visible),
+        .form-select:focus:not(:focus-visible) {
+          outline: none; box-shadow: none;
+        }
       `}</style>
     </div>
   );
