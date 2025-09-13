@@ -7,10 +7,11 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { stripePromise } from '../lib/stripe';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import FancyButton from '../components/FancyButton';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
-// USD formatter (UI display only)
+// USD formatter
 const fmtUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 // Helper: ODR-XXXXXXXXXXXX id (timestamp tail + 4 random digits)
@@ -49,10 +50,10 @@ function StripeInnerForm({ orderId, onDone }) {
   return (
     <form onSubmit={onSubmitStripe}>
       <PaymentElement />
-      <button className="btn btn-danger w-100 mt-3" disabled={!stripe || !elements || submitting}>
+      <FancyButton as="button" type="submit" className="fancy-sm w-100 mt-3" disabled={!stripe || !elements || submitting}>
         {submitting ? 'Processing…' : 'Pay now'}
-      </button>
-      {message && <div className="small mt-2">{message}</div>}
+      </FancyButton>
+      {message && <div className="small mt-2" style={{ color: '#000' }}>{message}</div>}
     </form>
   );
 }
@@ -71,7 +72,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zip: '',
-    country: 'US', // default to US if selling in USD
+    country: 'US',
     sameAsShipping: true,
     paymentMethod: 'cod', // cod | card
     promo: ''
@@ -85,7 +86,7 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState('');
   const [startingCardPay, setStartingCardPay] = useState(false);
 
-  // Coupons from backend validation
+  // Coupons
   const [coupon, setCoupon] = useState({ code: '', percent: 0, status: '' });
   const [promoMsg, setPromoMsg] = useState('');
 
@@ -95,20 +96,12 @@ export default function CheckoutPage() {
     () => items.reduce((sum, it) => sum + it.price * (it.quantity || 1), 0),
     [items]
   );
-
-  // Example USD shipping rule: Free over $50, otherwise $4.99
   const shipping = subtotal > 50 ? 0 : 4.99;
-
-  // 5% tax, round to cents
   const tax = Math.round(subtotal * 0.05 * 100) / 100;
-
-  // Discount from validated coupon percent
   const discount = useMemo(
     () => Math.round(subtotal * (coupon.percent / 100) * 100) / 100,
     [subtotal, coupon.percent]
   );
-
-  // Final total (round cents)
   const total = Math.max(0, Math.round((subtotal + shipping + tax - discount) * 100) / 100);
 
   // Validation
@@ -153,7 +146,7 @@ export default function CheckoutPage() {
     }
   };
 
-  // Payloads for server (authoritative totals should be computed on server)
+  // Payloads for server
   const cartPayload = items.map((it) => ({
     productId: it.id,
     qty: it.quantity || 1,
@@ -196,7 +189,7 @@ export default function CheckoutPage() {
     };
   };
 
-  // Start Stripe flow (server should create PaymentIntent with currency: 'usd' and amount in cents)
+  // Start Stripe flow
   const startStripeFlow = async () => {
     try {
       setStartingCardPay(true);
@@ -215,7 +208,7 @@ export default function CheckoutPage() {
     }
   };
 
-  // COD: generate local ODR- id, best-effort notify server, then redirect immediately
+  // COD
   const placeCodOrder = async () => {
     setSubmitting(true);
     const localOid = generateOrderId();
@@ -229,12 +222,12 @@ export default function CheckoutPage() {
           payment: { method: 'cod' },
           summary,
           note: 'COD checkout',
-          clientOrderId: localOid // optional server usage
+          clientOrderId: localOid
         },
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
       ).catch(() => {});
     } catch {
-      // ignore server failure to keep UX smooth
+      // ignore server failure
     } finally {
       setSubmitting(false);
       navigate(`/order/success?orderId=${encodeURIComponent(localOid)}`, { replace: true });
@@ -260,25 +253,40 @@ export default function CheckoutPage() {
     }
   };
 
+  // Stripe Elements appearance (monochrome)
   const elementsOptions = clientSecret
-    ? { clientSecret, appearance: { theme: 'stripe' } }
+    ? {
+        clientSecret,
+        appearance: {
+          theme: 'flat',
+          variables: {
+            colorPrimary: '#000000',
+            colorBackground: '#ffffff',
+            colorText: '#000000',
+            colorDanger: '#000000',
+            fontSizeBase: '16px',
+            spacingUnit: '4px',
+            borderRadius: '4px'
+          }
+        }
+      }
     : undefined;
 
   return (
-    <div className="min-vh-100" style={{ background: 'linear-gradient(135deg,#fff1f2,#fff7ed)' }}>
+    <div className="min-vh-100" style={{ backgroundColor: '#f1efef' }}>
       <div className="container py-4 py-lg-5">
         <div className="mb-4">
-          <h1 className="fw-bold h3 mb-1">Checkout</h1>
-          <p className="text-muted mb-0">Secure payment and fast delivery</p>
+          <h1 className="fw-bold h3 mb-1" style={{ color: '#000' }}>Checkout</h1>
+          <p className="mb-0" style={{ color: '#000' }}>Secure payment and fast delivery</p>
         </div>
 
         <div className="row g-4 g-lg-5">
           {/* Form */}
           <div className="col-12 col-lg-7">
             <form noValidate onSubmit={onSubmit} className="needs-validation">
-              <div className="card border-0 shadow-sm rounded-4 mb-3">
+              <div className="card border-0 shadow-sm rounded-4 mb-3" style={{ background: '#fff', color: '#000' }}>
                 <div className="card-body">
-                  <h5 className="fw-semibold mb-3 d-flex align-items-center gap-2">
+                  <h5 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ color: '#000' }}>
                     <Truck size={18} /> Shipping address
                   </h5>
 
@@ -407,9 +415,9 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="card border-0 shadow-sm rounded-4 mb-3">
+              <div className="card border-0 shadow-sm rounded-4 mb-3" style={{ background: '#fff', color: '#000' }}>
                 <div className="card-body">
-                  <h5 className="fw-semibold mb-3 d-flex align-items-center gap-2">
+                  <h5 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ color: '#000' }}>
                     <CreditCard size={18} /> Payment
                   </h5>
 
@@ -446,16 +454,16 @@ export default function CheckoutPage() {
                         <StripeInnerForm orderId={orderId} onDone={() => {}} />
                       </Elements>
                     ) : (
-                      <div className="alert alert-info mb-0">
+                      <div className="mono-alert mb-0">
                         Preparing secure payment… {startingCardPay ? 'Please wait.' : ''}
                       </div>
                     )
                   )}
 
                   {form.paymentMethod !== 'card' && (
-                    <div className="alert alert-info d-flex align-items-center gap-2 mb-0">
+                    <div className="mono-alert d-flex align-items-center gap-2 mb-0">
                       <ShieldCheck size={18} />
-                      <div className="small mb-0">
+                      <div className="small mb-0" style={{ color: '#000' }}>
                         Payments are processed securely; select Card/UPI to pay now.
                       </div>
                     </div>
@@ -464,24 +472,20 @@ export default function CheckoutPage() {
               </div>
 
               <div className="d-grid">
-                <motion.button
-                  whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  type="submit" disabled={submitting || items.length === 0}
-                  className="btn btn-danger rounded-4 py-3 fw-semibold"
-                >
+                <FancyButton as="button" type="submit" className="fancy-sm py-2" disabled={submitting || items.length === 0}>
                   {submitting ? 'Placing order...' : `Place order • ${fmtUSD.format(total)}`}
-                </motion.button>
+                </FancyButton>
               </div>
             </form>
           </div>
 
           {/* Summary */}
           <div className="col-12 col-lg-5">
-            <div className="card border-0 shadow-sm rounded-4 mb-3">
+            <div className="card border-0 shadow-sm rounded-4 mb-3" style={{ background: '#fff', color: '#000' }}>
               <div className="card-body">
-                <h5 className="fw-semibold mb-3">Order summary</h5>
+                <h5 className="fw-semibold mb-3" style={{ color: '#000' }}>Order summary</h5>
                 {items.length === 0 ? (
-                  <p className="text-muted mb-0">No items in cart.</p>
+                  <p className="mb-0" style={{ color: '#000' }}>No items in cart.</p>
                 ) : (
                   <div className="vstack gap-3">
                     {items.map((it) => (
@@ -489,39 +493,39 @@ export default function CheckoutPage() {
                         <img
                           src={it.image} alt={it.title}
                           className="rounded me-3 object-fit-cover"
-                          style={{ width: 56, height: 56 }}
+                          style={{ width: 56, height: 56, border: '1px solid #000' }}
                         />
-                        <div className="flex-grow-1">
+                        <div className="flex-grow-1" style={{ color: '#000' }}>
                           <div className="small fw-semibold">{it.title}</div>
-                          <div className="small text-muted">
+                          <div className="small">
                             {it.category} • Qty {it.quantity || 1}
                           </div>
                         </div>
-                        <div className="small fw-semibold">
+                        <div className="small fw-semibold" style={{ color: '#000' }}>
                           {fmtUSD.format(it.price * (it.quantity || 1))}
                         </div>
                       </div>
                     ))}
                     <hr className="my-2" />
-                    <div className="d-flex justify-content-between small">
+                    <div className="d-flex justify-content-between small" style={{ color: '#000' }}>
                       <span>Subtotal</span>
                       <span>{fmtUSD.format(subtotal)}</span>
                     </div>
-                    <div className="d-flex justify-content-between small">
+                    <div className="d-flex justify-content-between small" style={{ color: '#000' }}>
                       <span>Shipping</span>
                       <span>{shipping === 0 ? 'Free' : fmtUSD.format(shipping)}</span>
                     </div>
-                    <div className="d-flex justify-content-between small">
+                    <div className="d-flex justify-content-between small" style={{ color: '#000' }}>
                       <span>Tax (est.)</span>
                       <span>{fmtUSD.format(tax)}</span>
                     </div>
                     {discount > 0 && (
-                      <div className="d-flex justify-content-between small text-success">
+                      <div className="d-flex justify-content-between small" style={{ color: '#000' }}>
                         <span>Discount {coupon.code ? `(${coupon.code})` : ''}</span>
                         <span>-{fmtUSD.format(discount)}</span>
                       </div>
                     )}
-                    <div className="d-flex justify-content-between fw-bold">
+                    <div className="d-flex justify-content-between fw-bold" style={{ color: '#000' }}>
                       <span>Total</span>
                       <span>{fmtUSD.format(total)}</span>
                     </div>
@@ -531,9 +535,9 @@ export default function CheckoutPage() {
             </div>
 
             {/* Promo */}
-            <div className="card border-0 shadow-sm rounded-4">
+            <div className="card border-0 shadow-sm rounded-4" style={{ background: '#fff', color: '#000' }}>
               <div className="card-body">
-                <h6 className="fw-semibold mb-2 d-flex align-items-center gap-2">
+                <h6 className="fw-semibold mb-2 d-flex align-items-center gap-2" style={{ color: '#000' }}>
                   <Tag size={16} /> Apply promo code
                 </h6>
                 <form onSubmit={applyPromo} className="d-flex gap-2">
@@ -541,23 +545,50 @@ export default function CheckoutPage() {
                     type="text" className="form-control" placeholder="Enter code"
                     value={form.promo} onChange={(e) => setField('promo', e.target.value.toUpperCase())}
                   />
-                  <motion.button
-                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                    type="submit" className="btn btn-outline-secondary d-inline-flex align-items-center gap-2"
-                  >
+                  <FancyButton as="button" type="submit" className="fancy-sm d-inline-flex align-items-center gap-2">
                     <Percent size={16} />
                     Apply
-                  </motion.button>
+                  </FancyButton>
                 </form>
-                {promoMsg && <div className="small mt-2 text-muted">{promoMsg}</div>}
+                {promoMsg && <div className="small mt-2" style={{ color: '#000' }}>{promoMsg}</div>}
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-muted small mt-4 mb-0">
-          Amounts shown in USD for display; Stripe should create PaymentIntents with currency=usd and amounts in cents on the server. 
+        <p className="small mt-4 mb-0" style={{ color: '#000' }}>
+          Amounts shown in USD for display; Stripe should create PaymentIntents with currency=usd and amounts in cents on the server.
         </p>
+
+        {/* Local overrides for monochrome forms and alerts */}
+        <style>{`
+          /* Form controls focus in black, no blue glow */
+          .form-control:focus,
+          .form-select:focus {
+            border-color: #000 !important;
+            box-shadow: none !important;
+          }
+          /* Radios/checkboxes in black */
+          .form-check-input {
+            accent-color: #000;
+          }
+          /* Invalid state in black (no red) */
+          .form-control.is-invalid,
+          .was-validated .form-control:invalid {
+            border-color: #000 !important;
+            background-image: none !important;
+          }
+          .invalid-feedback { color: #000 !important; }
+
+          /* Monochrome alert */
+          .mono-alert {
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+          }
+        `}</style>
       </div>
     </div>
   );

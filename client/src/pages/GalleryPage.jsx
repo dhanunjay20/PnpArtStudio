@@ -9,8 +9,8 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 // Inline CSS
 const CustomStyles = () => (
   <style>{`
-    body { background-color: #f8f9fa; }
-    .gallery-page-bg { background: linear-gradient(to bottom right, #fff1f2, #fff7ed); }
+    body { background-color: #f1efef; }
+    .gallery-page-bg { background-color: #f1efef; }
 
     /* react-masonry-css recommended CSS */
     .my-masonry-grid { display: -webkit-box; display: -ms-flexbox; display: flex; margin-left: -16px; width: auto; }
@@ -25,7 +25,7 @@ const CustomStyles = () => (
     @media (min-width: 1200px){ .grid-cols { grid-template-columns: repeat(4, 1fr); } }
 
     /* Shared card visuals */
-    .gallery-card { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+    .gallery-card { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.08); background: #fff; }
     .gallery-card .card-img-overlay { position:absolute; inset:0; background-color: rgba(0,0,0,0); transition: background-color .25s ease; }
     .gallery-card:hover .card-img-overlay { background-color: rgba(0,0,0,0.45); }
     .gallery-card .overlay-content { opacity: 0; transform: translateY(6px); transition: opacity .25s ease, transform .25s ease; }
@@ -39,16 +39,85 @@ const CustomStyles = () => (
     .grid-card .card-img-top { width:100%; height:100%; display:block; object-fit: cover; transition: transform .6s ease; }
     .grid-card:hover .card-img-top { transform: scale(1.03); }
 
-    /* Modal polish and view toggle */
+    /* Controls: mono pills, icon buttons, focus rings */
+    .mono-pill {
+      border: 1px solid #000; background: #fff; color: #000;
+      border-radius: 999px; padding: 6px 14px; font-weight: 600;
+      transition: background-color .16s ease, color .16s ease, box-shadow .16s ease, transform .12s ease;
+    }
+    .mono-pill:hover { background: #000; color: #fff; }
+    .mono-pill.active { background: #000; color: #fff; }
+    .mono-pill:active { transform: scale(0.98); }
+    .mono-pill:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+    .mono-pill:focus { outline: 2px solid #000; outline-offset: 2px; }
+
+    .icon-toggle {
+      border: 1px solid transparent; background: transparent; color: #000;
+      border-radius: 8px; padding: 6px 10px; display: inline-flex; align-items: center; justify-content: center;
+      transition: background-color .16s ease, color .16s ease, box-shadow .16s ease, transform .12s ease, border-color .16s ease;
+    }
+    .icon-toggle:hover { background: #fff; border-color: #000; }
+    .icon-toggle.active { background: #fff; border-color: #000; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .icon-toggle:active { transform: scale(0.98); }
+    .icon-toggle:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+    .icon-toggle:focus { outline: 2px solid #000; outline-offset: 2px; }
+
+    .clear-btn {
+      border: 1px solid #000; background: #fff; color: #000; border-radius: 999px; width: 30px; height: 30px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .16s ease;
+    }
+    .clear-btn:hover { background: #000; color: #fff; }
+    .clear-btn:active { transform: scale(0.96); }
+    .clear-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+    .clear-btn:focus { outline: 2px solid #000; outline-offset: 2px; }
+
+    /* Mono badge for category chips on cards */
+    .mono-badge {
+      background: #fff; color: #000; border: 1px solid #000; border-radius: 999px; padding: 4px 8px; font-weight: 600;
+    }
+
+    /* Modal polish and controls */
     .modal.show { background-color: rgba(0,0,0,0.85); }
     .modal-content { border: none; border-radius: 1rem; }
-    .btn-close-modal { position: absolute; top: 12px; right: 12px; color: #111; background: #fff; border: 0; border-radius: 999px; width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 14px rgba(0,0,0,.25); cursor: pointer; }
-    .btn-close-modal:hover { opacity: 0.92; }
-    .view-toggle .btn.active { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .btn-close-modal {
+      position: absolute; top: 12px; right: 12px; color: #000; background: #fff; border: 2px solid #000; border-radius: 999px; width: 36px; height: 36px;
+      display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 14px rgba(0,0,0,.25); cursor: pointer;
+      transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .16s ease;
+    }
+    .btn-close-modal:hover { background: #000; color: #fff; }
+    .btn-close-modal:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+    .btn-close-modal:focus { outline: 2px solid #000; outline-offset: 2px; }
+
+    .mono-btn {
+      border: 1px solid #000; background: #fff; color: #000; border-radius: 8px; padding: 8px 12px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background-color .16s ease, color .16s ease, box-shadow .16s ease, transform .12s ease;
+    }
+    .mono-btn:hover { background: #000; color: #fff; }
+    .mono-btn:active { transform: scale(0.98); }
+    .mono-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+    .mono-btn:focus { outline: 2px solid #000; outline-offset: 2px; }
+
+    .mono-icon-btn {
+      border: 1px solid #000; background: #fff; color: #000; border-radius: 8px; padding: 6px 10px;
+      display: inline-flex; align-items: center; justify-content: center; transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .16s ease;
+    }
+    .mono-icon-btn:hover { background: #000; color: #fff; }
+    .mono-icon-btn:active { transform: scale(0.98); }
+    .mono-icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+    .mono-icon-btn:focus { outline: 2px solid #000; outline-offset: 2px; }
+
+    /* Inputs: focus styles in black */
+    .form-control:focus { border-color: #000 !important; box-shadow: none !important; }
+    .form-select:focus { border-color: #000 !important; box-shadow: none !important; }
 
     /* Tiny toast */
     .mini-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: rgba(17,17,17,.92); color: #fff; padding: 8px 12px; border-radius: 999px; font-size: 13px; line-height: 1; z-index: 2000; pointer-events: none; opacity: 1; transition: opacity .2s ease; }
     .mini-toast.hide { opacity: 0; }
+
+    /* Result box */
+    .controls-card { background: #fff; color: #000; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
   `}</style>
 );
 
@@ -63,7 +132,7 @@ export default function GalleryPage() {
   // UI
   const [selectedImage, setSelectedImage] = useState(null);
   const [filterCategory, setFilterCategory] = useState('All');
-  const [viewMode, setViewMode] = useState('masonry'); // Filter icon = Masonry, Grid icon = Grid [2]
+  const [viewMode, setViewMode] = useState('masonry'); // Filter icon = Masonry, Grid icon = Grid
   const [searchTerm, setSearchTerm] = useState('');
 
   // Debounce client-only search
@@ -71,7 +140,7 @@ export default function GalleryPage() {
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 400);
     return () => clearTimeout(t);
-  }, [searchTerm]); // Clipboard debounce pattern per MDN Promise usage [12]
+  }, [searchTerm]);
 
   // Data
   const [allItems, setAllItems] = useState([]);
@@ -98,7 +167,7 @@ export default function GalleryPage() {
       finally { if (!ignore) setLoading(false); }
     })();
     return () => { ignore = true; controller.abort(); };
-  }, []); // Masonry/grid purely front-end; only initial fetch [22]
+  }, []);
 
   // Local filtering
   const filteredItems = useMemo(() => {
@@ -112,7 +181,7 @@ export default function GalleryPage() {
       });
     }
     return list;
-  }, [allItems, filterCategory, debouncedSearch]); // Client-only search using includes() [22]
+  }, [allItems, filterCategory, debouncedSearch]);
 
   // Grid pattern heights per 4-column row
   const heightMapEven = [420, 280, 360, 300];
@@ -122,7 +191,7 @@ export default function GalleryPage() {
     const col = index % 4;
     const arr = (row % 2 === 0) ? heightMapEven : heightMapOdd;
     return arr[col];
-  }; // Deterministic per-row variety [7]
+  };
 
   // Lightbox
   const openLightbox = (image) => setSelectedImage(image);
@@ -139,7 +208,7 @@ export default function GalleryPage() {
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
     } catch { window.open(src, '_blank', 'noopener'); }
-  }; // HTMLAnchorElement.download behavior with Blob URLs [23]
+  };
 
   // Share via Web Share API with file/URL fallback
   const shareImage = async (img) => {
@@ -160,17 +229,17 @@ export default function GalleryPage() {
     if (src && navigator.clipboard?.writeText) {
       try { await navigator.clipboard.writeText(src); setToast({ show: true, text: 'Copied' }); setTimeout(() => setToast({ show: false, text: '' }), 500); return; } catch { /* ignore */ }
     }
-  }; // Web Share examples and requirements per MDN [17][13]
+  };
 
   // Copy helper (0.5s toast)
   const copyToClipboard = async (text) => {
     try { await navigator.clipboard.writeText(text); setToast({ show: true, text: 'Copied' }); }
     catch { setToast({ show: true, text: 'Copy failed' }); }
     finally { setTimeout(() => setToast({ show: false, text: '' }), 500); }
-  }; // Clipboard API writeText Promise-based usage [12][16]
+  };
 
   // Masonry breakpoints
-  const breakpointColumns = { default: 4, 1200: 4, 992: 3, 576: 2, 0: 1 }; // From package docs [2]
+  const breakpointColumns = { default: 4, 1200: 4, 992: 3, 576: 2, 0: 1 };
 
   // Card components
   const MasonryCard = ({ image }) => {
@@ -186,11 +255,11 @@ export default function GalleryPage() {
             </div>
           </div>
           <button type="button" className="stretched-link" style={{ position: 'absolute', inset: 0, opacity: 0 }} onClick={() => openLightbox(image)} aria-label={`Open ${image.title || 'artwork'}`} />
-          <span className="badge bg-light text-dark position-absolute top-0 start-0 m-3">{image.category || 'Other'}</span>
+          <span className="mono-badge position-absolute top-0 start-0 m-3">{image.category || 'Other'}</span>
         </div>
       </div>
     );
-  }; // True masonry with natural heights [2]
+  };
 
   const GridCard = ({ image, index }) => {
     const src = image.src || fallbackImg;
@@ -205,10 +274,10 @@ export default function GalleryPage() {
           </div>
         </div>
         <button type="button" className="stretched-link" style={{ position: 'absolute', inset: 0, opacity: 0 }} onClick={() => openLightbox(image)} aria-label={`Open ${image.title || 'artwork'}`} />
-        <span className="badge bg-light text-dark position-absolute top-0 start-0 m-3">{image.category || 'Other'}</span>
+        <span className="mono-badge position-absolute top-0 start-0 m-3">{image.category || 'Other'}</span>
       </div>
     );
-  }; // 4-column patterned grid using object-fit cover [22][7]
+  };
 
   const showingCount = filteredItems.length;
   const total = allItems.length;
@@ -220,18 +289,18 @@ export default function GalleryPage() {
         <div className="container-xl py-5">
           {/* Header */}
           <div className="text-center mb-5">
-            <h1 className="display-4 fw-bold text-dark mb-4">Art Gallery</h1>
-            <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '42rem' }}>
+            <h1 className="display-4 fw-bold mb-4" style={{ color: '#000' }}>Art Gallery</h1>
+            <p className="fs-5 mx-auto" style={{ maxWidth: '42rem', color: '#000' }}>
               Explore our complete collection of original artworks, exhibitions, and creative moments
             </p>
           </div>
 
           {/* Controls */}
-          <div className="bg-white rounded-4 shadow-lg p-4 mb-5">
+          <div className="controls-card p-4 mb-5">
             <div className="d-flex flex-column flex-lg-row gap-4 align-items-center justify-content-between">
               {/* Search (client-only) */}
               <div className="position-relative w-100" style={{ maxWidth: '480px' }}>
-                <Search className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" size={20} />
+                <Search className="position-absolute top-50 start-0 translate-middle-y ms-3" size={20} />
                 <input
                   type="text"
                   placeholder="Search artworks…"
@@ -242,7 +311,7 @@ export default function GalleryPage() {
                 {searchTerm && (
                   <button
                     type="button"
-                    className="position-absolute top-50 end-0 translate-middle-y me-2 btn btn-sm btn-light d-inline-flex align-items-center"
+                    className="position-absolute top-50 end-0 translate-middle-y me-2 clear-btn"
                     onClick={() => setSearchTerm('')}
                     title="Clear"
                     aria-label="Clear search"
@@ -259,7 +328,8 @@ export default function GalleryPage() {
                     <button
                       key={category}
                       onClick={() => setFilterCategory(category)}
-                      className={`btn rounded-pill ${filterCategory === category ? 'btn-danger' : 'btn-light text-secondary'}`}
+                      className={`mono-pill ${filterCategory === category ? 'active' : ''}`}
+                      type="button"
                     >
                       {category}
                     </button>
@@ -267,20 +337,22 @@ export default function GalleryPage() {
                 </div>
 
                 {/* View toggle: Filter = Masonry, Grid = Grid */}
-                <div className="btn-group bg-light p-1 rounded view-toggle">
+                <div className="d-inline-flex gap-1">
                   <button
                     onClick={() => setViewMode('masonry')}
-                    className={`btn border-0 ${viewMode === 'masonry' ? 'active' : ''}`}
+                    className={`icon-toggle ${viewMode === 'masonry' ? 'active' : ''}`}
                     title="Masonry (natural heights)"
                     aria-pressed={viewMode === 'masonry'}
+                    type="button"
                   >
                     <Filter size={16} />
                   </button>
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`btn border-0 ${viewMode === 'grid' ? 'active' : ''}`}
+                    className={`icon-toggle ${viewMode === 'grid' ? 'active' : ''}`}
                     title="Grid (4 columns)"
                     aria-pressed={viewMode === 'grid'}
+                    type="button"
                   >
                     <Grid size={16} />
                   </button>
@@ -291,11 +363,11 @@ export default function GalleryPage() {
 
           {/* Result count */}
           <div className="mb-4">
-            <p className="text-muted">Showing {showingCount} of {total} artwork{total !== 1 ? 's' : ''}</p>
+            <p style={{ color: '#000' }}>Showing {showingCount} of {total} artwork{total !== 1 ? 's' : ''}</p>
           </div>
 
           {/* Views */}
-          {err && <div className="alert alert-danger">{err}</div>}
+          {err && <div className="mono-alert">{err}</div>}
 
           {viewMode === 'masonry' ? (
             <Masonry
@@ -325,7 +397,7 @@ export default function GalleryPage() {
             <div className="modal fade show" style={{ display: 'block', zIndex: 1055, marginTop: '20px' }} onClick={closeLightbox} role="dialog" aria-modal="true">
               <div className="modal-dialog modal-xl modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-content position-relative">
-                  <button onClick={closeLightbox} className="btn-close-modal" aria-label="Close">
+                  <button onClick={closeLightbox} className="btn-close-modal" aria-label="Close" type="button">
                     <X size={18} />
                   </button>
                   <img
@@ -338,15 +410,15 @@ export default function GalleryPage() {
                   <div className="modal-body p-4">
                     <div className="d-flex align-items-start justify-content-between flex-wrap gap-3">
                       <div className="flex-grow-1">
-                        <h2 className="h4 fw-bold text-dark mb-2">{selectedImage.title || 'Untitled'}</h2>
-                        <p className="text-muted mb-2">{selectedImage.medium || '—'} • {selectedImage.year || ''}</p>
-                        <p className="text-secondary">{selectedImage.description || ''}</p>
+                        <h2 className="h4 fw-bold mb-2" style={{ color: '#000' }}>{selectedImage.title || 'Untitled'}</h2>
+                        <p className="mb-2" style={{ color: '#000' }}>{selectedImage.medium || '—'} • {selectedImage.year || ''}</p>
+                        <p style={{ color: '#000' }}>{selectedImage.description || ''}</p>
                         {selectedImage.src && (
                           <div className="mt-3">
-                            <label className="form-label small fw-semibold">Share URL</label>
+                            <label className="form-label small fw-semibold" style={{ color: '#000' }}>Share URL</label>
                             <div className="input-group">
                               <input className="form-control" readOnly value={selectedImage.src} />
-                              <button type="button" className="btn btn-outline-secondary" onClick={() => copyToClipboard(selectedImage.src)} title="Copy link">
+                              <button type="button" className="mono-icon-btn" onClick={() => copyToClipboard(selectedImage.src)} title="Copy link">
                                 <Copy size={16} />
                               </button>
                             </div>
@@ -354,11 +426,11 @@ export default function GalleryPage() {
                         )}
                       </div>
                       <div className="d-flex align-items-center gap-2">
-                        <button className="btn btn-light text-danger d-inline-flex align-items-center gap-2" onClick={() => downloadImage(selectedImage.src, `${(selectedImage.title || 'artwork').replace(/\s+/g,'_')}.jpg`)} title="Download image">
+                        <button className="mono-btn" onClick={() => downloadImage(selectedImage.src, `${(selectedImage.title || 'artwork').replace(/\s+/g,'_')}.jpg`)} title="Download image" type="button">
                           <Heart size={20} />
                           Download
                         </button>
-                        <button className="btn btn-light d-inline-flex align-items-center gap-2" onClick={() => shareImage(selectedImage)} title="Share image">
+                        <button className="mono-btn" onClick={() => shareImage(selectedImage)} title="Share image" type="button">
                           <Share2 size={20} />
                           Share
                         </button>

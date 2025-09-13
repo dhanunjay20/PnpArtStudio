@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Filter, Grid, List, Search } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { useProducts } from "../hooks/useProducts";
+import FancyButton from "../components/FancyButton";
 
 // Backend categories
 const CATEGORIES = [
@@ -34,6 +35,9 @@ const slugToCategory = (slug) => {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
+// USD formatter
+const fmtUSD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+
 export default function ShopPage() {
   const { category: categorySlug } = useParams();
   const { items, total, page, totalPages, loading, error, params, updateParam } = useProducts();
@@ -51,10 +55,11 @@ export default function ShopPage() {
     return "newest";
   });
 
+  // sync URL category with route
   useEffect(() => {
     const label = slugToCategory(categorySlug);
     updateParam("category", label);
-  }, [categorySlug]); // sync URL category with route
+  }, [categorySlug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { setSearchTerm(params.q || ""); }, [params.q]);
   useEffect(() => { setMin(params.minPrice || ""); setMax(params.maxPrice || ""); }, [params.minPrice, params.maxPrice]);
@@ -100,23 +105,23 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="min-vh-100" style={{ background: "linear-gradient(135deg,#fff1f2,#fff7ed)" }}>
+    <div className="min-vh-100" style={{ backgroundColor: "#f1efef" }}>
       <div className="container py-4 py-lg-5">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="fw-bold display-6 mb-2">{niceCategory}</h1>
-          <p className="text-muted mb-0">Discover unique, handcrafted artworks that bring beauty to your space</p>
+          <h1 className="fw-bold display-6 mb-2" style={{ color: "#000" }}>{niceCategory}</h1>
+          <p className="mb-0" style={{ color: "#000" }}>Discover unique, handcrafted artworks that bring beauty to your space</p>
         </div>
 
         {/* Search + Bar */}
-        <div className="card border-0 shadow-sm rounded-4 mb-4">
+        <div className="card border-0 shadow-sm rounded-4 mb-4" style={{ background: "#fff", color: "#000" }}>
           <div className="card-body">
             <div className="d-flex flex-column flex-lg-row gap-3 align-items-stretch align-items-lg-center justify-content-between">
               {/* Search */}
               <div className="w-100" style={{ maxWidth: 480 }}>
                 <div className="input-group">
-                  <span className="input-group-text bg-white">
-                    <Search size={18} className="text-secondary" />
+                  <span className="input-group-text" style={{ background: "#fff", color: "#000", borderColor: "#000" }}>
+                    <Search size={18} />
                   </span>
                   <input
                     type="text"
@@ -127,6 +132,7 @@ export default function ShopPage() {
                     onBlur={applySearch}
                     className="form-control"
                     aria-label="Search artworks"
+                    style={{ color: "#000", borderColor: "#000" }}
                   />
                 </div>
               </div>
@@ -137,7 +143,7 @@ export default function ShopPage() {
                   value={sortUI}
                   onChange={(e) => handleSort(e.target.value)}
                   className="form-select"
-                  style={{ minWidth: 200 }}
+                  style={{ minWidth: 200, color: "#000", borderColor: "#000" }}
                   aria-label="Sort products"
                 >
                   <option value="featured">Featured</option>
@@ -148,11 +154,11 @@ export default function ShopPage() {
                 </select>
 
                 {/* View mode */}
-                <div className="btn-group" role="group" aria-label="View mode">
+                <div className="d-inline-flex gap-1" role="group" aria-label="View mode">
                   <button
                     type="button"
                     onClick={() => setViewMode("grid")}
-                    className={`btn btn-outline-secondary ${viewMode === "grid" ? "active" : ""}`}
+                    className={`icon-toggle ${viewMode === "grid" ? "active" : ""}`}
                     title="Grid"
                   >
                     <Grid size={16} />
@@ -160,7 +166,7 @@ export default function ShopPage() {
                   <button
                     type="button"
                     onClick={() => setViewMode("list")}
-                    className={`btn btn-outline-secondary ${viewMode === "list" ? "active" : ""}`}
+                    className={`icon-toggle ${viewMode === "list" ? "active" : ""}`}
                     title="List"
                   >
                     <List size={16} />
@@ -171,7 +177,7 @@ export default function ShopPage() {
                 <button
                   type="button"
                   onClick={() => setShowFilters(!showFilters)}
-                  className="btn btn-outline-secondary d-inline-flex align-items-center gap-2"
+                  className="mono-btn d-inline-flex align-items-center gap-2"
                 >
                   <Filter size={16} />
                   <span>Filters</span>
@@ -181,14 +187,14 @@ export default function ShopPage() {
 
             {/* Advanced Filters */}
             {showFilters && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-4 pt-4 border-top">
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-4 pt-4" style={{ borderTop: "1px solid #000" }}>
                 <div className="row g-4">
                   {/* Categories (single-select) */}
                   <div className="col-12 col-md-4">
-                    <h6 className="fw-semibold mb-3">Categories</h6>
+                    <h6 className="fw-semibold mb-3" style={{ color: "#000" }}>Categories</h6>
                     <div className="vstack gap-2">
                       {CATEGORIES.map((cat) => (
-                        <label key={cat} className="d-flex align-items-center gap-2">
+                        <label key={cat} className="d-flex align-items-center gap-2" style={{ color: "#000" }}>
                           <input
                             type="radio"
                             name="cat"
@@ -204,7 +210,7 @@ export default function ShopPage() {
 
                   {/* Price Range */}
                   <div className="col-12 col-md-4">
-                    <h6 className="fw-semibold mb-3">Price Range</h6>
+                    <h6 className="fw-semibold mb-3" style={{ color: "#000" }}>Price Range</h6>
                     <form className="d-flex gap-2" onSubmit={applyPrice}>
                       <input
                         type="number"
@@ -214,6 +220,7 @@ export default function ShopPage() {
                         value={min}
                         onChange={(e) => setMin(e.target.value)}
                         aria-label="Minimum price"
+                        style={{ color: "#000", borderColor: "#000" }}
                       />
                       <input
                         type="number"
@@ -223,9 +230,14 @@ export default function ShopPage() {
                         value={max}
                         onChange={(e) => setMax(e.target.value)}
                         aria-label="Maximum price"
+                        style={{ color: "#000", borderColor: "#000" }}
                       />
-                      <button type="submit" className="btn btn-outline-secondary">Apply</button>
-                      <button type="button" className="btn btn-link text-danger text-decoration-none" onClick={() => { setMin(""); setMax(""); updateParam("minPrice",""); updateParam("maxPrice",""); }}>
+                      <button type="submit" className="mono-btn">Apply</button>
+                      <button
+                        type="button"
+                        className="mono-link-btn"
+                        onClick={() => { setMin(""); setMax(""); updateParam("minPrice",""); updateParam("maxPrice",""); }}
+                      >
                         Clear
                       </button>
                     </form>
@@ -233,23 +245,23 @@ export default function ShopPage() {
 
                   {/* Availability */}
                   <div className="col-12 col-md-4">
-                    <h6 className="fw-semibold mb-3">Availability</h6>
+                    <h6 className="fw-semibold mb-3" style={{ color: "#000" }}>Availability</h6>
                     <div className="d-flex gap-2">
                       <button
                         type="button"
-                        className={`btn btn-sm ${params.inStock === true ? "btn-danger" : "btn-outline-secondary"}`}
-                        onClick={() => updateParam("inStock", params.inStock === true ? "" : "true")}
+                        className={`mono-btn mono-btn-sm ${params.inStock === "true" ? "active" : ""}`}
+                        onClick={() => updateParam("inStock", params.inStock === "true" ? "" : "true")}
                       >
                         In stock
                       </button>
                       <button
                         type="button"
-                        className={`btn btn-sm ${params.inStock === false ? "btn-danger" : "btn-outline-secondary"}`}
-                        onClick={() => updateParam("inStock", params.inStock === false ? "" : "false")}
+                        className={`mono-btn mono-btn-sm ${params.inStock === "false" ? "active" : ""}`}
+                        onClick={() => updateParam("inStock", params.inStock === "false" ? "" : "false")}
                       >
                         Out of stock
                       </button>
-                      <button type="button" className="btn btn-link btn-sm text-danger text-decoration-none" onClick={clearAll}>
+                      <button type="button" className="mono-link-btn mono-btn-sm" onClick={clearAll}>
                         Clear all
                       </button>
                     </div>
@@ -262,8 +274,8 @@ export default function ShopPage() {
 
         {/* Results count and errors */}
         <div className="d-flex align-items-center justify-content-between mb-3">
-          <p className="text-muted mb-0">Showing {viewItems.length} of {total} result{total !== 1 ? "s" : ""}</p>
-          {error && <div className="alert alert-danger mb-0 py-1 px-2">Failed to load products: {error}</div>}
+          <p className="mb-0" style={{ color: "#000" }}>Showing {viewItems.length} of {total} result{total !== 1 ? "s" : ""}</p>
+          {error && <div className="mono-alert mb-0 py-1 px-2">Failed to load products: {error}</div>}
         </div>
 
         {/* Loading skeletons */}
@@ -271,8 +283,8 @@ export default function ShopPage() {
           <div className="row g-3 g-lg-4">
             {Array.from({ length: Number(params.limit || 12) }).map((_, i) => (
               <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-3">
-                <div className="card border-0 shadow-sm rounded-4 placeholder-glow" style={{ height: 320 }}>
-                  <div className="placeholder w-100 h-100 rounded-4" />
+                <div className="card border-0 shadow-sm rounded-4" style={{ height: 320, background: "#fff" }}>
+                  <div className="w-100 h-100 rounded-4" style={{ background: "#f6f6f6" }} />
                 </div>
               </div>
             ))}
@@ -280,8 +292,8 @@ export default function ShopPage() {
         ) : viewItems.length === 0 ? (
           <div className="text-center py-5">
             <div className="display-3 mb-2">🎨</div>
-            <h3 className="h5 fw-semibold mb-2">No artworks found</h3>
-            <p className="text-muted mb-0">Try adjusting filters or search terms</p>
+            <h3 className="h5 fw-semibold mb-2" style={{ color: "#000" }}>No artworks found</h3>
+            <p className="mb-0" style={{ color: "#000" }}>Try adjusting filters or search terms</p>
           </div>
         ) : viewMode === "grid" ? (
           <div className="row g-3 g-lg-4 mb-4">
@@ -309,9 +321,10 @@ export default function ShopPage() {
                 transition={{ duration: 0.6, delay: index * 0.06 }}
                 viewport={{ once: true }}
                 className="card border-0 shadow-sm rounded-4"
+                style={{ background: "#fff", color: "#000" }}
               >
                 <div className="card-body d-flex align-items-center gap-3">
-                  <div className="flex-shrink-0 rounded-3 overflow-hidden" style={{ width: 96, height: 96 }}>
+                  <div className="flex-shrink-0 rounded-3 overflow-hidden" style={{ width: 96, height: 96, border: "1px solid #000" }}>
                     <img
                       src={p.image}
                       alt={`${p.title} thumbnail`}
@@ -320,9 +333,9 @@ export default function ShopPage() {
                     />
                   </div>
                   <div className="flex-grow-1">
-                    <div className="fw-semibold mb-1">{p.title}</div>
-                    <div className="text-muted small mb-1">{p.category}</div>
-                    <div className="text-danger fw-bold">${Number(p.price).toLocaleString("en-IN")}</div>
+                    <div className="fw-semibold mb-1" style={{ color: "#000" }}>{p.title}</div>
+                    <div className="small mb-1" style={{ color: "#000" }}>{p.category}</div>
+                    <div className="fw-bold" style={{ color: "#000" }}>{fmtUSD.format(Number(p.price || 0))}</div>
                   </div>
                 </div>
               </motion.div>
@@ -333,17 +346,74 @@ export default function ShopPage() {
         {/* Load more */}
         {!loading && viewItems.length > 0 && (
           <div className="text-center">
-            <button
-              className="btn btn-danger px-4 py-2 rounded-pill fw-semibold"
+            <FancyButton
+              as="button"
+              type="button"
+              className="fancy-sm"
               onClick={loadMore}
               disabled={!canLoadMore}
+              aria-disabled={!canLoadMore}
               title={canLoadMore ? "Load more artworks" : "All results loaded"}
             >
               {canLoadMore ? "Load More Artworks" : "All results loaded"}
-            </button>
+            </FancyButton>
           </div>
         )}
       </div>
+
+      {/* Local monochrome + focus-visible + form theming */}
+      <style>{`
+        /* Inputs/selects focus in black */
+        .form-control:focus,
+        .form-select:focus {
+          border-color: #000 !important;
+          box-shadow: none !important;
+        }
+        /* Radios in black */
+        .form-check-input { accent-color: #000; }
+
+        /* Monochrome alert */
+        .mono-alert {
+          border: 1px solid #000;
+          background: #fff;
+          color: #000;
+          border-radius: 8px;
+          padding: 4px 8px;
+          display: inline-block;
+        }
+
+        /* Icon toggle buttons */
+        .icon-toggle {
+          border: 1px solid transparent; background: transparent; color: #000;
+          border-radius: 8px; padding: 6px 10px; display: inline-flex; align-items: center; justify-content: center;
+          transition: background-color .16s ease, color .16s ease, box-shadow .16s ease, transform .12s ease, border-color .16s ease;
+        }
+        .icon-toggle:hover { background: #fff; border-color: #000; }
+        .icon-toggle.active { background: #fff; border-color: #000; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+        .icon-toggle:active { transform: scale(0.98); }
+        .icon-toggle:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+        .icon-toggle:focus { outline: 2px solid #000; outline-offset: 2px; }
+
+        /* Mono buttons */
+        .mono-btn {
+          border: 1px solid #000; background: #fff; color: #000; border-radius: 8px; padding: 8px 12px; font-weight: 600;
+          transition: background-color .16s ease, color .16s ease, transform .12s ease, box-shadow .16s ease;
+        }
+        .mono-btn:hover { background: #000; color: #fff; }
+        .mono-btn:active { transform: scale(0.98); }
+        .mono-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+        .mono-btn:focus { outline: 2px solid #000; outline-offset: 2px; }
+        .mono-btn.active { background: #000; color: #fff; }
+        .mono-btn-sm { padding: 6px 10px; border-radius: 6px; }
+
+        /* Link-like button */
+        .mono-link-btn {
+          background: transparent; border: 0; color: #000; text-decoration: underline; font-weight: 600; padding: 6px 8px; border-radius: 6px;
+        }
+        .mono-link-btn:hover { background: #fff; }
+        .mono-link-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff; }
+        .mono-link-btn:focus { outline: 2px solid #000; outline-offset: 2px; }
+      `}</style>
     </div>
   );
 }

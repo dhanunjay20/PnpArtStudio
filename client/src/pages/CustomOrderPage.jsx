@@ -1,7 +1,8 @@
-// src/pages/CustomOrderPage.jsx
+// src/pages/CustomOrderPage.jsx (Monochrome + Fancy buttons)
 import React, { useState } from 'react';
 import customart from "../assets/custom_art_video.mp4";
 import { Palette, Upload, MessageSquare, DollarSign, CheckCircle } from 'lucide-react';
+import FancyButton from '../components/FancyButton';
 
 const CustomOrderPage = () => {
   const [formData, setFormData] = useState({
@@ -45,14 +46,10 @@ const CustomOrderPage = () => {
   const [visibleFaqs, setVisibleFaqs] = useState(4);
 
   return (
-    <div
-      className="min-vh-100 py-5"
-      style={{ background: 'linear-gradient(135deg,#fffbeb,#fff7ed,#ffe4e6)' }}
-    >
+    <div className="min-vh-100 py-5" style={{ backgroundColor: '#f1efef' }}>
       {/* Hero */}
       <div className="container mb-4">
-        <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
-          {/* Stretch columns to equal height */}
+        <div className="card border-0 shadow-sm rounded-4 overflow-hidden" style={{ background: '#fff', color: '#000' }}>
           <div className="row g-0 align-items-stretch">
             <div className="col-12 col-lg-6 d-flex h-100">
               <video
@@ -71,13 +68,13 @@ const CustomOrderPage = () => {
                 <div className="d-flex justify-content-start mb-3">
                   <div
                     className="rounded-circle p-3 d-flex align-items-center justify-content-center"
-                    style={{ background: 'linear-gradient(90deg,#d63384,#fd7e14)' }}
+                    style={{ background: '#fff', border: '2px solid #000', color: '#000' }}
                   >
-                    <Palette size={28} className="text-white" />
+                    <Palette size={28} />
                   </div>
                 </div>
-                <h2 className="fw-bold mb-2">Commission Custom Art</h2>
-                <p className="text-muted mb-0">
+                <h2 className="fw-bold mb-2" style={{ color: '#000' }}>Commission Custom Art</h2>
+                <p className="mb-0" style={{ color: '#000' }}>
                   Transform ideas into one‑of‑a‑kind pieces crafted to brief, budget, and timeline.
                 </p>
               </div>
@@ -90,44 +87,32 @@ const CustomOrderPage = () => {
       <div className="container" style={{ maxWidth: 960 }}>
         {/* Steps */}
         <div className="row row-cols-1 row-cols-md-4 g-3 g-md-4 mb-5">
-          <div className="col text-center">
-            <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2"
-                 style={{ width: 48, height: 48, background: '#ffe4e6' }}>
-              <MessageSquare size={22} style={{ color: '#e11d48' }} />
-            </div>
-            <h3 className="h6 fw-semibold mb-1">1. Consultation</h3>
-            <p className="small text-muted mb-0">Share the vision and requirements</p>
-          </div>
-          <div className="col text-center">
-            <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2"
-                 style={{ width: 48, height: 48, background: '#ffedd5' }}>
-              <DollarSign size={22} style={{ color: '#ea580c' }} />
-            </div>
-            <h3 className="h6 fw-semibold mb-1">2. Quote</h3>
-            <p className="small text-muted mb-0">Receive detailed pricing and timeline</p>
-          </div>
-          <div className="col text-center">
-            <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2"
-                 style={{ width: 48, height: 48, background: '#fef3c7' }}>
-              <Palette size={22} style={{ color: '#d97706' }} />
-            </div>
-            <h3 className="h6 fw-semibold mb-1">3. Creation</h3>
-            <p className="small text-muted mb-0">The artwork comes to life</p>
-          </div>
-          <div className="col text-center">
-            <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2"
-                 style={{ width: 48, height: 48, background: '#dcfce7' }}>
-              <CheckCircle size={22} style={{ color: '#16a34a' }} />
-            </div>
-            <h3 className="h6 fw-semibold mb-1">4. Delivery</h3>
-            <p className="small text-muted mb-0">Receive the masterpiece</p>
-          </div>
+          {[
+            { icon: MessageSquare, title: '1. Consultation', text: 'Share the vision and requirements' },
+            { icon: DollarSign,    title: '2. Quote',        text: 'Receive detailed pricing and timeline' },
+            { icon: Palette,       title: '3. Creation',     text: 'The artwork comes to life' },
+            { icon: CheckCircle,   title: '4. Delivery',     text: 'Receive the masterpiece' }
+          ].map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div key={s.title} className="col text-center">
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2"
+                  style={{ width: 48, height: 48, background: '#fff', color: '#000', border: '1px solid #000' }}
+                >
+                  <Icon size={22} />
+                </div>
+                <h3 className="h6 fw-semibold mb-1" style={{ color: '#000' }}>{s.title}</h3>
+                <p className="small mb-0" style={{ color: '#000' }}>{s.text}</p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Form */}
-        <div className="card border-0 shadow-sm rounded-4">
+        <div className="card border-0 shadow-sm rounded-4" style={{ background: '#fff', color: '#000' }}>
           <div className="card-body p-4 p-lg-5">
-            <h2 className="h4 fw-bold mb-4">Commission Request Form</h2>
+            <h2 className="h4 fw-bold mb-4" style={{ color: '#000' }}>Commission Request Form</h2>
 
             <form onSubmit={handleSubmit} className="vstack gap-4">
               <div className="row g-3">
@@ -212,8 +197,8 @@ const CustomOrderPage = () => {
               <div>
                 <label htmlFor="reference" className="form-label small fw-semibold">Reference Images</label>
                 <div className="rounded-3 text-center p-4"
-                     style={{ border: '2px dashed #d1d5db', transition: 'border-color .2s' }}>
-                  <Upload size={28} className="text-secondary mb-2" />
+                     style={{ border: '2px dashed #000', transition: 'border-color .2s' }}>
+                  <Upload size={28} className="mb-2" style={{ color: '#000' }} />
                   <input
                     type="file"
                     id="reference"
@@ -222,24 +207,24 @@ const CustomOrderPage = () => {
                     accept="image/*"
                     className="d-none"
                   />
-                  <label htmlFor="reference" className="d-block">
-                    <span className="fw-semibold" style={{ color: '#d63384', cursor: 'pointer' }}>
+                  <label htmlFor="reference" className="d-block" style={{ cursor: 'pointer' }}>
+                    <span className="fw-semibold" style={{ color: '#000' }}>
                       Click to upload
                     </span>
-                    <span className="text-muted"> or drag and drop</span>
+                    <span style={{ color: '#000' }}> or drag and drop</span>
                   </label>
-                  <p className="text-secondary small mb-0">PNG, JPG, GIF up to 10MB</p>
+                  <p className="small mb-0" style={{ color: '#000' }}>PNG, JPG up to 10MB</p>
                 </div>
                 {formData.reference && (
-                  <div className="mt-2 small text-muted">
+                  <div className="mt-2 small" style={{ color: '#000' }}>
                     Selected: {formData.reference.name}
                   </div>
                 )}
               </div>
 
-              <div className="rounded-3 p-3" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
-                <h3 className="h6 fw-semibold mb-2" style={{ color: '#92400e' }}>What happens next?</h3>
-                <ul className="small mb-0" style={{ color: '#b45309' }}>
+              <div className="rounded-3 p-3" style={{ background: '#fff', border: '1px solid #000', color: '#000' }}>
+                <h3 className="h6 fw-semibold mb-2">What happens next?</h3>
+                <ul className="small mb-0" style={{ color: '#000' }}>
                   <li>I’ll review the request within 24 hours</li>
                   <li>A detailed quote and timeline will be shared</li>
                   <li>We can schedule a consultation call if needed</li>
@@ -247,30 +232,26 @@ const CustomOrderPage = () => {
                 </ul>
               </div>
 
-              <button
-                type="submit"
-                className="btn w-100 text-white fw-semibold py-3 shadow-sm"
-                style={{ background: 'linear-gradient(90deg,#d63384,#fd7e14)', borderRadius: 12 }}
-              >
+              <FancyButton as="button" type="submit" className="fancy-sm w-100">
                 Submit Commission Request
-              </button>
+              </FancyButton>
             </form>
           </div>
         </div>
 
         {/* FAQ */}
-        <div className="card border-0 shadow-sm rounded-4 mt-5">
+        <div className="card border-0 shadow-sm rounded-4 mt-5" style={{ background: '#fff', color: '#000' }}>
           <div className="card-body p-4 p-lg-5">
-            <h2 className="h4 fw-bold mb-4">Frequently Asked Questions</h2>
+            <h2 className="h4 fw-bold mb-4" style={{ color: '#000' }}>Frequently Asked Questions</h2>
 
             <div id="faq-list" className="vstack gap-2">
               {faqs.slice(0, visibleFaqs).map((item, idx) => (
                 <div key={`${item.q}-${idx}`} className="faq-item p-3 rounded-3" tabIndex={0} aria-haspopup="true">
                   <div className="d-flex align-items-center justify-content-between">
-                    <span className="fw-semibold">{item.q}</span>
-                    <span className="text-muted small ms-3">Hover or focus</span>
+                    <span className="fw-semibold" style={{ color: '#000' }}>{item.q}</span>
+                    <span className="small ms-3" style={{ color: '#000' }}>Hover or focus</span>
                   </div>
-                  <div className="faq-answer text-muted small mt-2">
+                  <div className="faq-answer small mt-2" style={{ color: '#000' }}>
                     {item.a}
                   </div>
                 </div>
@@ -279,41 +260,42 @@ const CustomOrderPage = () => {
 
             <div className="d-flex justify-content-center gap-2 mt-3">
               {visibleFaqs < faqs.length && (
-                <button
+                <FancyButton as="button"
                   type="button"
-                  className="btn btn-outline-secondary rounded-pill px-4"
+                  className="fancy-sm"
                   onClick={() => setVisibleFaqs((n) => Math.min(n + 4, faqs.length))}
                   aria-controls="faq-list"
                   aria-expanded={visibleFaqs > 4}
                 >
                   Show more ({faqs.length - visibleFaqs} left)
-                </button>
+                </FancyButton>
               )}
 
               {visibleFaqs > 4 && (
-                <button
+                <FancyButton as="button"
                   type="button"
-                  className="btn btn-outline-secondary rounded-pill px-4"
+                  className="fancy-sm"
                   onClick={() => setVisibleFaqs(4)}
                   aria-controls="faq-list"
                   aria-expanded={false}
                 >
                   Show less
-                </button>
+                </FancyButton>
               )}
             </div>
 
             <style>{`
               .faq-item {
                 background-color: #fff;
-                border: 1px solid #f1f5f9;
-                transition: box-shadow .18s ease, border-color .18s ease;
+                border: 1px solid #000;
+                transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
                 outline: none;
                 cursor: pointer;
               }
               .faq-item:hover, .faq-item:focus-within {
-                border-color: #f3d9e3;
-                box-shadow: 0 8px 20px rgba(214, 51, 132, 0.12);
+                border-color: #000;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+                transform: translateY(-1px);
               }
               .faq-answer {
                 max-height: 0;
@@ -326,6 +308,17 @@ const CustomOrderPage = () => {
                 max-height: 200px;
                 opacity: 1;
               }
+              /* Monochrome form focus and controls */
+              .form-control:focus, .form-select:focus {
+                border-color: #000 !important;
+                box-shadow: none !important;
+              }
+              .form-check-input { accent-color: #000; }
+              /* Keyboard focus ring for FAQ tiles */
+              .faq-item:focus-visible {
+                box-shadow: 0 0 0 2px #000, 0 0 0 5px #fff;
+              }
+              .faq-item:focus { outline: 2px solid #000; outline-offset: 2px; }
             `}</style>
           </div>
         </div>

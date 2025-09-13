@@ -1,64 +1,95 @@
-/* Fixed host; transform driven by WAAPI initially and then held at rest */
+/* src/components/FallingCart.css */
+
+/* Host position is handled inline for dynamic right/bottom; keep stacking context simple */
 .falling-cart-auto {
   position: fixed;
-  z-index: 1040;
-  /* right/bottom via style props */
+  z-index: 1060; /* above content, below modals if any */
+  will-change: transform;
 }
 
-/* Reduce motion: no falling */
-@media (prefers-reduced-motion: reduce) {
-  .falling-cart-auto { transform: none !important; }
-}
-
-/* Button (same as before) */
+/* Monochrome circular button: black base, white icon, invert on hover */
 .fc-btn {
-  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  border: 2px solid #000;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  width: 48px;
-  height: 48px;
-  border-radius: 9999px;
-  border: 1px solid rgba(0,0,0,.06);
-
-  color: #fff;
-  background: linear-gradient(90deg, #d63384, #fd7e14);
-  box-shadow: 0 8px 24px rgba(214, 51, 132, 0.28);
-  cursor: pointer;
-
-  transition: transform .15s ease, box-shadow .15s ease;
+  position: relative;
+  overflow: hidden; /* for ripples */
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 120ms ease;
 }
-.fc-btn:hover,
+
+/* Hover invert: white surface, black icon */
+.fc-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* Press feedback */
+.fc-btn:active {
+  transform: scale(0.96);
+}
+
+/* Accessible focus ring (keyboard only) */
 .fc-btn:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(214, 51, 132, 0.34);
   outline: none;
+  box-shadow:
+    0 0 0 2px #000,  /* inner ring for light bg */
+    0 0 0 5px #fff;  /* outer ring for dark bg */
 }
 
-/* Ripple aura */
+/* Fallback focus for older browsers */
+.fc-btn:focus {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+/* Monochrome ripples: subtle pulse from center, no color */
 .fc-btn .ripples {
   position: absolute;
-  inset: -6px;
-  border-radius: 9999px;
+  inset: 0;
+  border-radius: 50%;
   pointer-events: none;
-  display: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 60%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 250ms ease, transform 300ms ease;
 }
-.fc-btn:hover .ripples,
-.fc-btn:focus-visible .ripples { display: block; }
 
-.fc-btn .ripples::before,
-.fc-btn .ripples::after {
-  content: "";
+/* Monochrome ripples: black pulse from center */
+.fc-btn .ripples {
   position: absolute;
   inset: 0;
-  border-radius: 9999px;
-  border: 2px solid rgba(214, 51, 132, 0.45);
-  animation: fc-ripple 1.6s ease-out infinite;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 60%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 250ms ease, transform 300ms ease;
 }
-.fc-btn .ripples::after { animation-delay: .8s; }
 
-@keyframes fc-ripple {
-  0%   { transform: scale(1);   opacity: .5; }
-  100% { transform: scale(1.8); opacity: 0;  }
+/* Show ripple on hover/focus */
+.fc-btn:hover .ripples,
+.fc-btn:focus-visible .ripples {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Show ripple on hover/focus; it’s decorative only and aria-hidden in markup */
+.fc-btn:hover .ripples,
+.fc-btn:focus-visible .ripples {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Reduced motion: remove animated pulse/ripple transitions */
+@media (prefers-reduced-motion: reduce) {
+  .fc-btn,
+  .fc-btn .ripples {
+    transition: none;
+  }
 }

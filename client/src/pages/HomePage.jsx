@@ -1,20 +1,18 @@
 // src/pages/HomePage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight, Star, Users, Award, Palette, Sparkles, Paintbrush, Gem, Shield, GraduationCap, Calendar
+  Star, Users, Award, Palette, Sparkles, Paintbrush, Gem, Shield, GraduationCap, Calendar
 } from 'lucide-react';
 import axios from 'axios';
-import img from '../assets/pexels-steve-1070534.jpg';
 
 import HeroCarousel from '../components/HeroCarousel';
 import ProductCard from '../components/ProductCard';
+import FancyButton from '../components/FancyButton';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 function HomePage() {
-  // Featured products from API
   const [products, setProducts] = useState([]);
   const [loadingProd, setLoadingProd] = useState(false);
   const [prodErr, setProdErr] = useState('');
@@ -25,12 +23,10 @@ function HomePage() {
       try {
         setLoadingProd(true);
         setProdErr('');
-        // Adjust the endpoint/params to match your backend
         const { data } = await axios.get(`${API_BASE}/api/products`, {
           params: { limit: 6 },
           withCredentials: true
         });
-        // Support either { items: [...] } or a raw array
         const list = Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : []);
         if (isMounted) setProducts(list);
       } catch (e) {
@@ -43,7 +39,6 @@ function HomePage() {
     return () => { isMounted = false; };
   }, []);
 
-  // Normalize minimal fields ProductCard might need (id/image/back-compat)
   const featuredProducts = useMemo(
     () =>
       (products || []).map((p) => ({
@@ -55,70 +50,23 @@ function HomePage() {
   );
 
   const testimonials = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      text:
-        'The attention to detail in every piece is extraordinary. My custom painting exceeded all expectations!',
-      rating: 5,
-      avatar:
-        'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      text:
-        'Beautiful artwork that transforms my living space. The quality is outstanding and delivery was perfect.',
-      rating: 5,
-      avatar:
-        'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'
-    },
-    {
-      id: 3,
-      name: 'Emily Rodriguez',
-      text:
-        "I've ordered multiple pieces and each one is a masterpiece. Highly recommend for art lovers!",
-      rating: 5,
-      avatar:
-        'https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'
-    }
-  ];
-
-  const blogTeasers = [
-    {
-      id: 'the-language-of-color',
-      title: 'The Language of Color: Emotion in Abstract Art',
-      image: img,
-      excerpt:
-        'Colors speak before shapes do. Explore how hue and contrast carry meaning and shape mood.',
-    },
-    {
-      id: 'choosing-art-for-your-space',
-      title: 'Choosing Art for Your Space: A Practical Guide',
-      image:
-        'https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&fit=crop',
-      excerpt:
-        'Scale, light, and palette matter. Select artworks that harmonize with architecture and style.',
-    },
-    {
-      id: 'oil-vs-acrylic',
-      title: 'Oil vs. Acrylic: What Collectors Should Know',
-      image:
-        'https://images.pexels.com/photos/1646953/pexels-photo-1646953.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&fit=crop',
-      excerpt:
-        'Both mediums offer unique character. Understand drying, sheen, and long-term care.',
-    }
+    { id: 1, name: 'Sarah Johnson', text: 'The attention to detail in every piece is extraordinary. My custom painting exceeded all expectations!', rating: 5,
+      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+    { id: 2, name: 'Michael Chen', text: 'Beautiful artwork that transforms my living space. The quality is outstanding and delivery was perfect.', rating: 5,
+      avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' },
+    { id: 3, name: 'Emily Rodriguez', text: "I've ordered multiple pieces and each one is a masterpiece. Highly recommend for art lovers!", rating: 5,
+      avatar: 'https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' }
   ];
 
   return (
-    <div className="min-vh-100">
+    <div className="min-vh-100" style={{ backgroundColor: '#f1efef' }}>
       {/* HERO */}
-      <section className="position-relative vh-100 overflow-hidden">
+      <section className="position-relative vh-100 overflow-hidden" style={{ backgroundColor: '#f1efef' }}>
         <HeroCarousel autoPlay interval={4000} showArrows showIndicators />
       </section>
 
       {/* STATS */}
-      <section className="py-5 bg-white">
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
           <div className="row row-cols-2 row-cols-md-4 g-4 text-center">
             {[
@@ -137,12 +85,12 @@ function HomePage() {
               >
                 <div className="d-flex justify-content-center mb-3">
                   <div className="rounded-circle d-flex align-items-center justify-content-center"
-                       style={{ width: 64, height: 64, background: '#ffe4e6' }}>
-                    <stat.icon size={30} color="#d63384" />
+                       style={{ width: 64, height: 64, background: '#ffffff', color: '#000000' }}>
+                    <stat.icon size={30} color="#000000" />
                   </div>
                 </div>
-                <div className="fs-3 fw-bold text-dark mb-1">{stat.number}</div>
-                <div className="text-muted">{stat.label}</div>
+                <div className="fs-3 fw-bold mb-1" style={{ color: '#000' }}>{stat.number}</div>
+                <div style={{ color: '#000' }}>{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -150,7 +98,7 @@ function HomePage() {
       </section>
 
       {/* HIGHLIGHTS */}
-      <section className="py-5" style={{ background: 'linear-gradient(135deg,#fff1f2,#fff7ed)' }}>
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
           <div className="row g-3 g-lg-4">
             {[
@@ -159,24 +107,16 @@ function HomePage() {
               { icon: Sparkles,   title: 'Custom Commissions',    text: 'Tailored pieces created for specific spaces and moods.' },
               { icon: Shield,     title: 'Art-Safe Packaging',    text: 'Secure shipping worldwide with protective materials.' }
             ].map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="col-12 col-md-6 col-lg-3"
-              >
-                <div className="card h-100 border-0 shadow-sm rounded-4">
+              <motion.div key={item.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                          transition={{ delay: i * 0.05 }} className="col-12 col-md-6 col-lg-3">
+                <div className="card h-100 border-0 shadow-sm rounded-4" style={{ backgroundColor: '#ffffff', color: '#000' }}>
                   <div className="card-body">
-                    <div
-                      className="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
-                      style={{ width: 44, height: 44, background: '#fff1f2' }}
-                    >
-                      <item.icon size={20} style={{ color: '#d63384' }} />
+                    <div className="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                         style={{ width: 44, height: 44, background: '#ffffff', color: '#000000' }}>
+                      <item.icon size={20} color="#000000" />
                     </div>
-                    <h6 className="fw-semibold mb-1">{item.title}</h6>
-                    <p className="text-muted small mb-0">{item.text}</p>
+                    <h6 className="fw-semibold mb-1" style={{ color: '#000' }}>{item.title}</h6>
+                    <p className="small mb-0" style={{ color: '#000' }}>{item.text}</p>
                   </div>
                 </div>
               </motion.div>
@@ -186,22 +126,17 @@ function HomePage() {
       </section>
 
       {/* ART CLASSES */}
-      <section className="py-5 bg-white">
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-4 mb-lg-5"
-          >
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}
+                      className="text-center mb-4 mb-lg-5">
             <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
-                 style={{ width: 56, height: 56, background: '#ffe4e6', color: '#d63384' }}>
-              <GraduationCap size={26} />
+                 style={{ width: 56, height: 56, background: '#ffffff', color: '#000000' }}>
+              <GraduationCap size={26} color="#000000" />
             </div>
-            <h2 className="fw-bold mb-2">Learn with Art Classes</h2>
-            <p className="lead text-muted mx-auto" style={{ maxWidth: 720 }}>
-              Live online sessions now, with offline studio classes coming soon—build skills in drawing, acrylics, and watercolor
+            <h2 className="fw-bold mb-2" style={{ color: '#000' }}>Learn with Art Classes</h2>
+            <p className="lead mx-auto" style={{ maxWidth: 720, color: '#000' }}>
+              Live online sessions now, with offline studio classes coming soon — build skills in drawing, acrylics, and watercolor
             </p>
           </motion.div>
 
@@ -211,24 +146,16 @@ function HomePage() {
               { icon: Calendar, title: 'Flexible Schedule', text: 'Weekend and evening batches designed around busy calendars.' },
               { icon: Paintbrush, title: 'Guided Techniques', text: 'Step‑by‑step demos to master fundamentals and explore styles.' }
             ].map((f, i) => (
-              <motion.div
-                key={f.title}
-                className="col-12 col-md-4"
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-              >
-                <div className="card h-100 border-0 shadow-sm rounded-4">
+              <motion.div key={f.title} className="col-12 col-md-4" initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.05 }}>
+                <div className="card h-100 border-0 shadow-sm rounded-4" style={{ backgroundColor: '#ffffff', color: '#000' }}>
                   <div className="card-body">
-                    <div
-                      className="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
-                      style={{ width: 44, height: 44, background: '#fff1f2' }}
-                    >
-                      <f.icon size={20} style={{ color: '#d63384' }} />
+                    <div className="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                         style={{ width: 44, height: 44, background: '#ffffff', color: '#000000' }}>
+                      <f.icon size={20} color="#000000" />
                     </div>
-                    <h6 className="fw-semibold mb-1">{f.title}</h6>
-                    <p className="text-muted small mb-0">{f.text}</p>
+                    <h6 className="fw-semibold mb-1" style={{ color: '#000' }}>{f.title}</h6>
+                    <p className="small mb-0" style={{ color: '#000' }}>{f.text}</p>
                   </div>
                 </div>
               </motion.div>
@@ -236,37 +163,35 @@ function HomePage() {
           </div>
 
           <div className="text-center">
-            <Link to="/art-classes" className="btn btn-danger px-4 py-3 fw-semibold rounded-pill d-inline-flex align-items-center gap-2">
+            <FancyButton to="/art-classes" className="fancy-sm">
               Explore Art Classes
-              <ArrowRight size={18} />
-            </Link>
+            </FancyButton>
           </div>
         </div>
       </section>
 
       {/* FEATURED PRODUCTS FROM API */}
-      <section className="py-5 bg-white">
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-4 mb-lg-5"
-          >
-            <h2 className="fw-bold mb-2">Featured Artworks</h2>
-            <p className="lead text-muted mx-auto" style={{ maxWidth: 720 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}
+                      className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold mb-2" style={{ color: '#000' }}>Featured Artworks</h2>
+            <p className="lead mx-auto" style={{ maxWidth: 720, color: '#000' }}>
               Discover our most popular and recently created masterpieces
             </p>
           </motion.div>
 
-          {prodErr && <div className="alert alert-danger">{prodErr}</div>}
+          {prodErr && (
+            <div className="alert d-flex align-items-center" role="alert" style={{ background: '#fff', color: '#000', border: '1px solid #000' }}>
+              {prodErr}
+            </div>
+          )}
 
           <div className="row g-4 mb-4">
             {loadingProd ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="col-12 col-md-6 col-lg-4">
-                  <div className="card h-100 border-0 shadow-sm rounded-4 placeholder-wave" style={{ minHeight: 320 }}>
+                  <div className="card h-100 border-0 shadow-sm rounded-4 placeholder-wave" style={{ minHeight: 320, backgroundColor: '#ffffff' }}>
                     <div className="card-body">
                       <div className="placeholder col-12 mb-3" style={{ height: 180 }} />
                       <div className="placeholder col-6" />
@@ -277,14 +202,8 @@ function HomePage() {
               ))
             ) : (
               featuredProducts.map((product, idx) => (
-                <motion.div
-                  key={product.id}
-                  className="col-12 col-md-6 col-lg-4"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: idx * 0.1 }}
-                  viewport={{ once: true }}
-                >
+                <motion.div key={product.id} className="col-12 col-md-6 col-lg-4" initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: idx * 0.1 }} viewport={{ once: true }}>
                   <ProductCard product={product} />
                 </motion.div>
               ))
@@ -292,55 +211,39 @@ function HomePage() {
           </div>
 
           <div className="text-center">
-            <Link to="/shop" className="btn btn-danger px-4 py-3 fw-semibold rounded-pill">
+            <FancyButton to="/shop" className="fancy-sm">
               View All Artworks
-            </Link>
+            </FancyButton>
           </div>
         </div>
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-5" style={{ background: 'linear-gradient(135deg,#fff1f2,#fff7ed)' }}>
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-4 mb-lg-5"
-          >
-            <h2 className="fw-bold mb-2">What Our Customers Say</h2>
-            <p className="lead text-muted">Trusted by art lovers worldwide</p>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}
+                      className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold mb-2" style={{ color: '#000' }}>What Our Customers Say</h2>
+            <p className="" style={{ color: '#000' }}>Trusted by art lovers worldwide</p>
           </motion.div>
 
           <div className="row g-4">
             {testimonials.map((t, idx) => (
-              <motion.div
-                key={t.id}
-                className="col-12 col-md-4"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div className="card h-100 border-0 shadow-sm rounded-4">
+              <motion.div key={t.id} className="col-12 col-md-4" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: idx * 0.1 }} viewport={{ once: true }}>
+                <div className="card h-100 border-0 shadow-sm rounded-4" style={{ backgroundColor: '#ffffff', color: '#000' }}>
                   <div className="card-body p-4">
                     <div className="d-flex mb-3">
                       {Array.from({ length: t.rating }).map((_, i) => (
-                        <Star key={i} size={18} color="#f1c40f" fill="#f1c40f" />
+                        <Star key={i} size={18} color="#000000" fill="#000000" />
                       ))}
                     </div>
-                    <p className="fst-italic text-dark mb-4">“{t.text}”</p>
+                    <p className="fst-italic mb-4" style={{ color: '#000' }}>“{t.text}”</p>
                     <div className="d-flex align-items-center gap-3">
-                      <img
-                        src={t.avatar}
-                        alt={t.name}
-                        className="rounded-circle object-fit-cover"
-                        style={{ width: 48, height: 48 }}
-                      />
+                      <img src={t.avatar} alt={t.name} className="rounded-circle object-fit-cover" style={{ width: 48, height: 48 }} />
                       <div>
-                        <div className="fw-semibold">{t.name}</div>
-                        <div className="text-muted small">Verified Customer</div>
+                        <div className="fw-semibold" style={{ color: '#000' }}>{t.name}</div>
+                        <div className="small" style={{ color: '#000' }}>Verified Customer</div>
                       </div>
                     </div>
                   </div>
@@ -351,54 +254,12 @@ function HomePage() {
         </div>
       </section>
 
-      {/* BLOG */}
-      <section className="py-5 bg-white">
-        <div className="container">
-          <div className="d-flex align-items-center justify-content-between mb-3">
-            <h2 className="fw-bold mb-0">From the Studio Blog</h2>
-            <Link to="/blog" className="text-decoration-none" style={{ color: '#d63384' }}>
-              View all
-            </Link>
-          </div>
-
-          <div className="row g-3 g-lg-4">
-            {blogTeasers.map((b, idx) => (
-              <motion.div
-                key={b.id}
-                className="col-12 col-md-4"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.05 }}
-                viewport={{ once: true }}
-              >
-                <Link to={`/blog/${b.id}`} className="text-decoration-none text-dark">
-                  <article className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                    <div className="ratio ratio-16x9">
-                      <img src={b.image} alt={b.title} className="w-100 h-100 object-fit-cover" />
-                    </div>
-                    <div className="card-body">
-                      <h3 className="h5 fw-semibold mb-2 line-clamp-2">{b.title}</h3>
-                      <p className="text-muted mb-0 line-clamp-3">{b.excerpt}</p>
-                    </div>
-                  </article>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* NEWSLETTER */}
-      <section className="py-5" style={{ background: 'linear-gradient(90deg,#d63384,#fd7e14)' }}>
-        <div className="container text-center text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="fw-bold mb-2">Stay Connected</h2>
-            <p className="lead text-white-50 mb-4">
+      {/* NEWSLETTER (black background with auto-invert buttons) */}
+      <section className="py-5 on-dark" style={{ backgroundColor: '#000000' }}>
+        <div className="container text-center">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+            <h2 className="fw-bold mb-2" style={{ color: '#ffffff' }}>Stay Connected</h2>
+            <p className="lead mb-4" style={{ color: '#ffffff' }}>
               Subscribe to get updates on new artworks, exhibitions, and exclusive offers
             </p>
 
@@ -407,14 +268,12 @@ function HomePage() {
                 type="email"
                 className="form-control form-control-lg rounded-pill"
                 placeholder="Enter your email"
+                style={{ backgroundColor: '#ffffff', color: '#000000', borderColor: '#ffffff' }}
+                aria-label="Email address"
               />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn btn-light text-danger fw-semibold px-4 py-2 rounded-pill"
-              >
+              <FancyButton as="button" type="button" className="fancy-sm">
                 Subscribe
-              </motion.button>
+              </FancyButton>
             </div>
           </motion.div>
         </div>

@@ -17,10 +17,8 @@ axios.defaults.withCredentials = true;
 const CATEGORIES = [
   "Paintings",
   "Indian Products",
-  "Workshops",
-  "Custom Orders",
+  "Pencil Sketches",
   "Digital Prints",
-  "Handcrafted Items",
   "Limited Editions"
 ];
 
@@ -705,7 +703,7 @@ export default function ProductsPage() {
                     onClick={() => setSlide(i)}
                     style={{
                       width: 56, height: 56, objectFit: "cover", borderRadius: 8,
-                      outline: i === slide ? "2px solid #dc3545" : "1px solid #ddd", cursor: "pointer"
+                      outline: i === slide ? "2px solid #603130" : "1px solid #ddd", cursor: "pointer"
                     }}
                   />
                 ))}

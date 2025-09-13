@@ -2,11 +2,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart, X } from "lucide-react"; // removed User
+import { ShoppingCart, Heart, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import CartDropdown from "./CartDropdown";
 import "./Header.css";
 import logo from "../assets/pnplogo2.svg";
+import FancyButton from "./FancyButton";
 
 const Header = () => {
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
@@ -17,7 +18,6 @@ const Header = () => {
   const { totalItems, dispatch } = useCart();
   const location = useLocation();
 
-  // Detect hover-capable pointers
   useEffect(() => {
     const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
     const update = () => setCanHover(mq.matches);
@@ -30,7 +30,6 @@ const Header = () => {
     };
   }, []);
 
-  // Click outside to close Shop
   useEffect(() => {
     const onDocClick = (e) => {
       if (!dropdownRef.current) return;
@@ -40,7 +39,6 @@ const Header = () => {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
-  // Close menus on route change
   useEffect(() => {
     setIsShopDropdownOpen(false);
     setIsOpen(false);
@@ -74,12 +72,11 @@ const Header = () => {
   };
 
   const toggleNavbar = () => setIsOpen((v) => !v);
-
   const isShopActive = location.pathname.startsWith("/shop");
 
   return (
-    <header className="shadow-sm fixed-top bg-white">
-      <nav className="navbar navbar-expand-lg navbar-light bg-white">
+    <header className="shadow-sm fixed-top header-bg">
+      <nav className="navbar navbar-expand-lg navbar-light header-bg">
         <div className="container">
           {/* Brand */}
           <Link className="navbar-brand d-flex align-items-center" to="/" onClick={handleNavClick}>
@@ -115,47 +112,17 @@ const Header = () => {
             <div className="flex-grow-1 d-lg-flex justify-content-center">
               <ul className="navbar-nav mb-2 mb-lg-0 gap-lg-1">
                 <li className="nav-item">
-                  <NavLink
-                    end
-                    to="/"
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}
-                  >
+                  <NavLink end to="/" onClick={handleNavClick} className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}>
                     Home
                   </NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink
-                    to="/about"
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}
-                  >
+                  <NavLink to="/about" onClick={handleNavClick} className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}>
                     About Us
                   </NavLink>
                 </li>
 
-                <li className="nav-item">
-                  <NavLink
-                    to="/art-classes"
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}
-                  >
-                    Art Classes
-                  </NavLink>
-                </li>
-
-                <li className="nav-item">
-                  <NavLink
-                    to="/custom-order"
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}
-                  >
-                    Custom Art
-                  </NavLink>
-                </li>
-
-                {/* Shop with nested submenu */}
                 <li
                   ref={dropdownRef}
                   className={`nav-item dropdown ${canHover ? "" : "dropdown-center"}`}
@@ -180,11 +147,7 @@ const Header = () => {
                     </span>
                   </Link>
 
-                  <ul
-                    className={`dropdown-menu ${isShopDropdownOpen ? "show" : ""}`}
-                    aria-labelledby="shopDropdown"
-                    data-bs-display="static"
-                  >
+                  <ul className={`dropdown-menu ${isShopDropdownOpen ? "show" : ""}`} aria-labelledby="shopDropdown" data-bs-display="static">
                     {topCategories.map((c) => (
                       <li key={c.label}>
                         <NavLink
@@ -216,14 +179,8 @@ const Header = () => {
                         if (menu) menu.classList.remove("show");
                       } : undefined}
                     >
-                      <Link
-                        className="dropdown-item dropdown-toggle nav-hover"
-                        to="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        data-bs-display="static"
-                        onClick={(ev) => { ev.preventDefault(); ev.stopPropagation(); }}
-                      >
+                      <Link className="dropdown-item dropdown-toggle nav-hover" to="#" role="button" data-bs-toggle="dropdown" data-bs-display="static"
+                        onClick={(ev) => { ev.preventDefault(); ev.stopPropagation(); }}>
                         Indian Products
                       </Link>
                       <ul className="dropdown-menu" data-bs-display="static">
@@ -244,21 +201,26 @@ const Header = () => {
                 </li>
 
                 <li className="nav-item">
-                  <NavLink
-                    to="/gallery"
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}
-                  >
+                  <NavLink to="/art-classes" onClick={handleNavClick} className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}>
+                    Art Classes
+                  </NavLink>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/custom-order" onClick={handleNavClick} className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}>
+                    Custom Art
+                  </NavLink>
+                </li>
+
+                
+                <li className="nav-item">
+                  <NavLink to="/gallery" onClick={handleNavClick} className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}>
                     Gallery
                   </NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink
-                    to="/contact"
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}
-                  >
+                  <NavLink to="/contact" onClick={handleNavClick} className={({ isActive }) => `nav-link nav-hover ${isActive ? "active" : ""}`}>
                     Contact
                   </NavLink>
                 </li>
@@ -285,10 +247,11 @@ const Header = () => {
                   onClick={handleCartClick}
                   aria-label="Cart"
                   title="Cart"
+                  type="button"
                 >
                   <ShoppingCart size={20} />
                   {totalItems > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill badge-count">
                       {totalItems}
                     </span>
                   )}
@@ -296,19 +259,11 @@ const Header = () => {
                 <CartDropdown />
               </li>
 
-              {/* Track Order CTA replaces Login/user */}
+              {/* Track Order CTA with Fancy button */}
               <li className="nav-item">
-                <NavLink
-                  to="/track-order"
-                  onClick={handleNavClick}
-                  className={({ isActive }) =>
-                    `btn btn-danger fw-semibold text-white px-3 py-2 d-inline-flex align-items-center ${isActive ? "active" : ""}`
-                  }
-                  aria-label="Track Order"
-                  title="Track Order"
-                >
+                <FancyButton to="/track-order" className="ms-lg-2 fancy-sm m-l 2" aria-label="Track Order">
                   Track Order
-                </NavLink>
+                </FancyButton>
               </li>
             </ul>
           </div>

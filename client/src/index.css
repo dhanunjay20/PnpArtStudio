@@ -4,8 +4,3 @@
   padding-top: 100px;
 }
 
-/* Optional: active nav styling */
-.nav-link.active {
-  color: #d63384 !important;
-  font-weight: 600;
-}

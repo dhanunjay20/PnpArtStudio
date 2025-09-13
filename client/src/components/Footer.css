@@ -2,7 +2,7 @@
   color: rgb(159, 227, 117) !important;
 }
 /* Subtle link hover */
-.footer-link:hover { color: #d63384 !important; }
+.footer-link:hover { color: white !important; }
 
 /* Optional input focus ring that matches brand */
 .form-control:focus {

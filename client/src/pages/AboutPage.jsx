@@ -1,8 +1,9 @@
-// AboutPage.jsx — Bootstrap version (fixed overflow/right margin)
+// src/pages/AboutPage.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Award, Palette, Users, Star, Heart } from 'lucide-react';
 import { Link } from "react-router-dom";
+import FancyButton from '../components/FancyButton';
 
 const AboutPage = () => {
   const milestones = [
@@ -28,49 +29,27 @@ const AboutPage = () => {
   ];
 
   return (
-    <div className="min-vh-100 about-root" style={{ background: 'linear-gradient(135deg,#fff1f2,#fff7ed)' }}>
-      {/* Local, page-scoped CSS to prevent horizontal overflow */}
+    <div className="min-vh-100 about-root" style={{ backgroundColor: '#f1efef', color: '#000' }}>
       <style>{`
         .about-root { overflow-x: clip; }
         @supports not (overflow: clip) { .about-root { overflow-x: hidden; } }
-
-        /* Ensure media never causes layout shifts */
         .about-hero-img { display:block; width:100%; height:600px; object-fit:cover; }
-
-        /* Keep timeline visuals inside the container box */
         .timeline-wrap { position: relative; overflow: clip; }
         @supports not (overflow: clip) { .timeline-wrap { overflow: hidden; } }
-
-        /* Optional: if you draw a center line/dots, keep them centered without overflow */
-        .timeline-line {
-          position:absolute; top:0; bottom:0; left:50%; width:2px;
-          transform:translateX(-1px);
-          background: linear-gradient(180deg,#ffd1dc,#ffe3c2);
-        }
-        .timeline-dot {
-          position:absolute; left:50%; transform:translate(-50%, -50%);
-          width:12px; height:12px; border-radius:50%;
-          background: linear-gradient(90deg,#d63384,#fd7e14);
-          box-shadow: 0 0 0 3px rgba(255,255,255,.9);
-        }
-
-        /* Keep the floating rating card inside the image bounds on all screens */
-        .rating-card {
-          left: 16px; bottom: 16px; transform: none; /* was left:-24; bottom:-24; translateY(-50%) */
-        }
-
-        /* Bootstrap rows already manage gutters; no negative margins outside .container */
+        .timeline-line { position:absolute; top:0; bottom:0; left:50%; width:2px; transform:translateX(-1px); background: rgba(0,0,0,0.15); }
+        .timeline-dot { position:absolute; left:50%; transform:translate(-50%, -50%); width:12px; height:12px; border-radius:50%; background: #000; box-shadow: 0 0 0 3px rgba(255,255,255,.95); }
+        .rating-card { left: 16px; bottom: 16px; transform: none; }
       `}</style>
 
       {/* Hero */}
-      <section className="py-5">
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
           <div className="row g-4 align-items-center">
             {/* Text */}
             <div className="col-12 col-lg-6">
               <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-                <h1 className="fw-bold display-5 mb-3">Meet the Artist</h1>
-                <div className="lead text-muted mb-4">
+                <h1 className="fw-bold display-5 mb-3" style={{ color: '#000' }}>Meet the Artist</h1>
+                <div className="lead mb-4" style={{ color: '#000' }}>
                   <p className="mb-3">
                     This is Priyanka Vasista, and art has been a part of my life since childhood. I was first inspired by my father, who painted as a hobby. Watching him work with colors sparked my imagination and ignited my lifelong passion for art.
                   </p>
@@ -78,13 +57,14 @@ const AboutPage = () => {
                     Over the years, that passion has grown into both a creative journey and a career. I have been teaching art for more than 10 years, guiding students of all ages to explore their creativity. Alongside teaching, I actively create and share my own artwork.
                   </p>
                   <p className="mb-0">
-                    Art, for me, is not just an expression but also a way to bring joy and meaning to people’s lives whether it’s through a painting that decorates a home, a custom piece that carries special memories, or a creative class that inspires a child.                  </p>
+                    Art, for me, is not just an expression but also a way to bring joy and meaning to people’s lives whether it’s through a painting that decorates a home, a custom piece that carries special memories, or a creative class that inspires a child.
+                  </p>
                 </div>
 
                 <div className="d-flex flex-wrap gap-2">
-                  <span className="badge bg-white text-danger border shadow-sm px-3 py-2">🎨 Traditional Techniques</span>
-                  <span className="badge bg-white text-warning border shadow-sm px-3 py-2">✨ Modern Innovation</span>
-                  <span className="badge bg-white text-warning border shadow-sm px-3 py-2">💝 Custom Creations</span>
+                  <span className="badge border shadow-sm px-3 py-2" style={{ background: '#fff', color: '#000' }}>🎨 Traditional Techniques</span>
+                  <span className="badge border shadow-sm px-3 py-2" style={{ background: '#fff', color: '#000' }}>✨ Modern Innovation</span>
+                  <span className="badge border shadow-sm px-3 py-2" style={{ background: '#fff', color: '#000' }}>💝 Custom Creations</span>
                 </div>
               </motion.div>
             </div>
@@ -101,18 +81,16 @@ const AboutPage = () => {
                   <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(to top, rgba(0,0,0,.35), transparent)' }} />
                 </div>
 
-                {/* Keep inside the image (no negative offsets) */}
+                {/* Rating card */}
                 <div className="position-absolute rating-card">
-                  <div className="bg-white p-3 rounded-4 shadow">
-                    <div className="d-flex align-items-center gap-1 text-warning mb-1">
-                      <Star size={18} fill="currentColor" />
-                      <Star size={18} fill="currentColor" />
-                      <Star size={18} fill="currentColor" />
-                      <Star size={18} fill="currentColor" />
-                      <Star size={18} fill="currentColor" />
+                  <div className="bg-white p-3 rounded-4 shadow" style={{ color: '#000' }}>
+                    <div className="d-flex align-items-center gap-1 mb-1" style={{ color: '#000' }}>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} size={18} color="#000" fill="#000" />
+                      ))}
                     </div>
-                    <div className="text-muted small">4.9/5 Customer Rating</div>
-                    <div className="fw-semibold">1000+ Happy Customers</div>
+                    <div className="small" style={{ color: '#000' }}>4.9/5 Customer Rating</div>
+                    <div className="fw-semibold" style={{ color: '#000' }}>1000+ Happy Customers</div>
                   </div>
                 </div>
               </motion.div>
@@ -122,40 +100,30 @@ const AboutPage = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-5 bg-white">
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
           <div className="row g-4">
             <div className="col-12 col-md-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="rounded-4 p-4 p-lg-5"
-                style={{ background: 'linear-gradient(135deg,#ffe4e6,#ffedd5)' }}
-              >
-                <div className="rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 64, height: 64, background: '#d63384' }}>
-                  <Heart size={28} className="text-white" />
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                          className="rounded-4 p-4 p-lg-5" style={{ backgroundColor: '#ffffff', color: '#000' }}>
+                <div className="rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 64, height: 64, background: '#ffffff', color: '#000' }}>
+                  <Heart size={28} color="#000" />
                 </div>
-                <h3 className="fw-bold mb-3">Our Mission</h3>
-                <p className="mb-0">
+                <h3 className="fw-bold mb-3" style={{ color: '#000' }}>Our Mission</h3>
+                <p className="mb-0" style={{ color: '#000' }}>
                   To create meaningful connections between art and people—bringing joy, inspiration, and beauty into every home through original, handcrafted artworks that tell stories and evoke emotions.
                 </p>
               </motion.div>
             </div>
 
             <div className="col-12 col-md-6">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="rounded-4 p-4 p-lg-5"
-                style={{ background: 'linear-gradient(135deg,#ffedd5,#fef3c7)' }}
-              >
-                <div className="rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 64, height: 64, background: '#fd7e14' }}>
-                  <Palette size={28} className="text-white" />
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
+                          className="rounded-4 p-4 p-lg-5" style={{ backgroundColor: '#ffffff', color: '#000' }}>
+                <div className="rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 64, height: 64, background: '#ffffff', color: '#000' }}>
+                  <Palette size={28} color="#000" />
                 </div>
-                <h3 className="fw-bold mb-3">Our Vision</h3>
-                <p className="mb-0">
+                <h3 className="fw-bold mb-3" style={{ color: '#000' }}>Our Vision</h3>
+                <p className="mb-0" style={{ color: '#000' }}>
                   To become a global platform where art enthusiasts discover unique, authentic pieces while supporting independent artists and fostering a vibrant creative community.
                 </p>
               </motion.div>
@@ -165,11 +133,12 @@ const AboutPage = () => {
       </section>
 
       {/* Timeline */}
-      <section className="py-5">
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-4 mb-lg-5">
-            <h2 className="fw-bold display-6 mb-2">My Artistic Journey</h2>
-            <p className="lead text-muted mb-0">Key milestones that shaped my career</p>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                      className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold display-6 mb-2" style={{ color: '#000' }}>My Artistic Journey</h2>
+            <p className="mb-0" style={{ color: '#000' }}>Key milestones that shaped my career</p>
           </motion.div>
 
           <div className="position-relative timeline-wrap">
@@ -178,24 +147,18 @@ const AboutPage = () => {
               {milestones.map((m, i) => {
                 const left = i % 2 === 0;
                 return (
-                  <motion.div
-                    key={`${m.year}-${m.title}`}
-                    initial={{ opacity: 0, x: left ? -30 : 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: i * 0.1 }}
-                    className="position-relative"
-                  >
+                  <motion.div key={`${m.year}-${m.title}`} initial={{ opacity: 0, x: left ? -30 : 30 }} whileInView={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.6, delay: i * 0.1 }} className="position-relative">
                     <div className="row align-items-stretch">
                       <div className={`col-12 col-lg-6 ${left ? '' : 'order-lg-2'}`}>
-                        <div className={`h-100 p-4 rounded-4 shadow-sm bg-white ${left ? 'me-lg-4 text-lg-end' : 'ms-lg-4 text-lg-start'}`}>
-                          <div className="fw-bold" style={{ color: '#d63384', fontSize: 24 }}>{m.year}</div>
-                          <h3 className="h5 fw-semibold mb-2">{m.title}</h3>
-                          <p className="mb-0 text-muted">{m.description}</p>
+                        <div className={`h-100 p-4 rounded-4 shadow-sm bg-white ${left ? 'me-lg-4 text-lg-end' : 'ms-lg-4 text-lg-start'}`} style={{ color: '#000' }}>
+                          <div className="fw-bold" style={{ fontSize: 24, color: '#000' }}>{m.year}</div>
+                          <h3 className="h5 fw-semibold mb-2" style={{ color: '#000' }}>{m.title}</h3>
+                          <p className="mb-0" style={{ color: '#000' }}>{m.description}</p>
                         </div>
                       </div>
                       <div className={`col-12 col-lg-6 ${left ? 'order-lg-2' : ''}`} />
                     </div>
-                    {/* Optional dot; if using, position it with top relative to the block */}
                     {/* <div className="timeline-dot" style={{ top: '50%' }} /> */}
                   </motion.div>
                 );
@@ -206,30 +169,24 @@ const AboutPage = () => {
       </section>
 
       {/* Achievements */}
-      <section className="py-5 bg-white">
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-4 mb-lg-5">
-            <h2 className="fw-bold mb-2">Achievements &amp; Impact</h2>
-            <p className="lead text-muted mb-0">Numbers that reflect the journey</p>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                      className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold mb-2" style={{ color: '#000' }}>Achievements &amp; Impact</h2>
+            <p className="mb-0" style={{ color: '#000' }}>Numbers that reflect the journey</p>
           </motion.div>
 
           <div className="row row-cols-2 row-cols-md-4 g-4">
             {achievements.map((a, i) => (
-              <motion.div
-                key={a.label}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="col text-center"
-              >
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                  style={{ width: 80, height: 80, background: 'linear-gradient(135deg,#ffe4e6,#ffedd5)' }}
-                >
-                  <a.icon size={40} style={{ color: '#d63384' }} />
+              <motion.div key={a.label} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: i * 0.1 }} className="col text-center">
+                <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                     style={{ width: 80, height: 80, background: '#ffffff', color: '#000' }}>
+                  <a.icon size={40} color="#000" />
                 </div>
-                <div className="fw-bold" style={{ fontSize: 28 }}>{a.number}</div>
-                <div className="text-muted fw-medium">{a.label}</div>
+                <div className="fw-bold" style={{ fontSize: 28, color: '#000' }}>{a.number}</div>
+                <div className="fw-medium" style={{ color: '#000' }}>{a.label}</div>
               </motion.div>
             ))}
           </div>
@@ -237,27 +194,23 @@ const AboutPage = () => {
       </section>
 
       {/* Press */}
-      <section className="py-5" style={{ background: '#f8f9fa' }}>
+      <section className="py-5" style={{ backgroundColor: '#f1efef' }}>
         <div className="container">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-4 mb-lg-5">
-            <h2 className="fw-bold mb-2">Press &amp; Recognition</h2>
-            <p className="lead text-muted mb-0">Featured in leading art publications</p>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                      className="text-center mb-4 mb-lg-5">
+            <h2 className="fw-bold mb-2" style={{ color: '#000' }}>Press &amp; Recognition</h2>
+            <p className="mb-0" style={{ color: '#000' }}>Featured in leading art publications</p>
           </motion.div>
 
           <div className="row g-4">
             {pressFeatures.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="col-12 col-md-6 col-lg-4"
-              >
-                <div className="card h-100 border-0 rounded-4 shadow-sm p-4">
-                  <div className="text-danger fw-bold mb-1">{f.publication}</div>
-                  <h3 className="h5 fw-semibold mb-1">{f.title}</h3>
-                  <div className="text-muted small mb-3">{f.year}</div>
-                  <blockquote className="mb-0 fst-italic">“{f.quote}”</blockquote>
+              <motion.div key={f.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: i * 0.1 }} className="col-12 col-md-6 col-lg-4">
+                <div className="card h-100 border-0 rounded-4 shadow-sm p-4" style={{ backgroundColor: '#ffffff', color: '#000' }}>
+                  <div className="fw-bold mb-1" style={{ color: '#000' }}>{f.publication}</div>
+                  <h3 className="h5 fw-semibold mb-1" style={{ color: '#000' }}>{f.title}</h3>
+                  <div className="small mb-3" style={{ color: '#000' }}>{f.year}</div>
+                  <blockquote className="mb-0 fst-italic" style={{ color: '#000' }}>“{f.quote}”</blockquote>
                 </div>
               </motion.div>
             ))}
@@ -265,24 +218,19 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-5" style={{ background: 'linear-gradient(90deg,#d63384,#fd7e14)' }}>
-        <div className="container text-center text-white">
+      {/* CTA (black background with auto-invert buttons) */}
+      <section className="py-5 on-dark" style={{ backgroundColor: '#000' }}>
+        <div className="container text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <h2 className="fw-bold mb-2">Ready to Start Your Art Collection?</h2>
-            <p className="lead text-white-50 mb-4">Explore the gallery or commission a custom piece that speaks to your heart</p>
+            <h2 className="fw-bold mb-2" style={{ color: '#fff' }}>Ready to Start Your Art Collection?</h2>
+            <p className="mb-4" style={{ color: '#fff' }}>Explore the gallery or commission a custom piece that speaks to your heart</p>
             <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-              <Link to="/gallery" className="text-decoration-none"> {/* Browse Gallery */}
-                <button className="btn btn-light text-danger fw-semibold rounded-pill px-4">
-                  Browse Gallery
-                </button>
-              </Link>
-                      
-              <Link to="/custom-order" className="text-decoration-none"> {/* Commission Custom Art */}
-                <button className="btn btn-outline-light fw-semibold rounded-pill px-4">
-                  Commission Custom Art
-                </button>
-              </Link>
+              <FancyButton to="/gallery" className="fancy-sm">
+                Browse Gallery
+              </FancyButton>
+              <FancyButton to="/custom-order" className="fancy-sm">
+                Commission Custom Art
+              </FancyButton>
             </div>
           </motion.div>
         </div>

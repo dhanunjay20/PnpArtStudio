@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import FancyButton from './FancyButton'; // uses the previously added monochrome button
 
 // Local hero images
 import img1 from '../assets/heroimg1.jpg';
@@ -50,7 +51,7 @@ const imageVariants = {
   enter: (dir) => ({ x: dir > 0 ? 80 : -80, opacity: 1 }),
   center: { x: 0, opacity: 1, transition: { duration: 0.55, ease: 'easeOut' } },
   exit: (dir) => ({ x: dir > 0 ? -80 : 80, opacity: 1, transition: { duration: 0.45, ease: 'easeIn' } })
-}; // slide images horizontally; keeps overlay stable per carousel patterns [18][1]
+};
 
 export default function HeroCarousel({
   slides = PAINTING_SLIDES,
@@ -87,13 +88,13 @@ export default function HeroCarousel({
     clearTimer();
     timeoutRef.current = setTimeout(next, Math.max(1500, interval));
   };
-  useEffect(() => { startTimer(); return clearTimer; }, [index, autoPlay, interval, total]); // restart each change [1]
+  useEffect(() => { startTimer(); return clearTimer; }, [index, autoPlay, interval, total]); // restart each change
 
   // Hover pause
   const onMouseEnter = () => { pausedRef.current = true; clearTimer(); };
   const onMouseLeave = () => { pausedRef.current = false; startTimer(); };
 
-  // Touch swipe
+  // Touch swipe (fixed: use first touch point)
   const onTouchStart = (e) => { if (e.changedTouches?.length) touchStartX.current = e.changedTouches.clientX; };
   const onTouchMove = (e) => { if (e.changedTouches?.length) touchEndX.current = e.changedTouches.clientX; };
   const onTouchEnd = () => {
@@ -141,8 +142,8 @@ export default function HeroCarousel({
         aria-hidden="true"
       />
 
-      {/* Fade-only overlay content */}
-      <div className="position-absolute top-50 start-50 translate-middle w-100 px-3 px-md-4" style={{ maxWidth: 1200 }}>
+      {/* Fade-only overlay content with auto-inverted buttons */}
+      <div className="position-absolute top-50 start-50 translate-middle w-100 px-3 px-md-4 on-dark" style={{ maxWidth: 1200 }}>
         <div className="mx-auto" style={{ maxWidth: 980 }}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -172,10 +173,9 @@ export default function HeroCarousel({
               )}
 
               {content.cta && (
-                <a href={content.cta.href} className="btn-gradient">
-                  <span>{content.cta.label}</span>
-                  <ArrowRight size={18} />
-                </a>
+                <FancyButton to={content.cta.href} className="fancy-sm" aria-label={content.cta.label}>
+                  {content.cta.label} <ArrowRight size={18} />
+                </FancyButton>
               )}
             </motion.div>
           </AnimatePresence>
@@ -187,7 +187,7 @@ export default function HeroCarousel({
         <>
           <button
             type="button" aria-label="Previous slide" onClick={prev}
-            className="btn position-absolute z-3 p-0 d-flex align-items-center justify-content-center"
+            className="btn position-absolute z-3 p-0 d-flex align-items-center justify-content-center hero-ctrl"
             style={{
               top: '50%', left: 16, transform: 'translateY(-50%)', width: 48, height: 48,
               borderRadius: '50%', background: 'rgba(255,255,255,.9)', boxShadow: '0 2px 10px rgba(0,0,0,.15)'
@@ -197,7 +197,7 @@ export default function HeroCarousel({
           </button>
           <button
             type="button" aria-label="Next slide" onClick={next}
-            className="btn position-absolute z-3 p-0 d-flex align-items-center justify-content-center"
+            className="btn position-absolute z-3 p-0 d-flex align-items-center justify-content-center hero-ctrl"
             style={{
               top: '50%', right: 16, transform: 'translateY(-50%)', width: 48, height: 48,
               borderRadius: '50%', background: 'rgba(255,255,255,.9)', boxShadow: '0 2px 10px rgba(0,0,0,.15)'
@@ -216,7 +216,7 @@ export default function HeroCarousel({
             return (
               <button
                 key={s.id} type="button" aria-label={`Go to slide ${i + 1}`} onClick={() => goTo(i)}
-                className="p-0 border-0"
+                className="p-0 border-0 hero-ind"
                 style={{
                   width: active ? 22 : 10, height: 10, borderRadius: 999,
                   background: active ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.6)',
@@ -228,21 +228,13 @@ export default function HeroCarousel({
         </div>
       )}
 
-      {/* Gradient CTA styles */}
+      {/* Local focus-visible styles for controls (keyboard users) */}
       <style>{`
-        .btn-gradient {
-          display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-          padding: 12px 20px; color: #fff; text-decoration: none; border: 0; border-radius: 999px;
-          background: linear-gradient(120deg, #d63384, #fd7e14);
-          background-size: 200% 100%; background-position: 100% 0;
-          box-shadow: 0 6px 22px rgba(0,0,0,.25);
-          transition: background-position .45s ease, transform .18s ease, box-shadow .18s ease;
+        .hero-ctrl:focus-visible,
+        .hero-ind:focus-visible {
+          outline: 2px solid #fff;
+          outline-offset: 2px;
         }
-        .btn-gradient:hover, .btn-gradient:focus-visible {
-          background-position: 0 0; transform: translateY(-1px) scale(1.03);
-          box-shadow: 0 10px 28px rgba(0,0,0,.3); outline: none;
-        }
-        .btn-gradient:active { transform: translateY(0) scale(0.99); box-shadow: 0 6px 18px rgba(0,0,0,.25); }
       `}</style>
     </div>
   );
