@@ -5,11 +5,11 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { rateLimit } from 'express-rate-limit';
 
-import { connectDB } from './config/db.js';
-import { corsAllWithCreds } from './config/cors.js';
-import routes from './routes/index.js';
-import { notFound, errorHandler } from './middleware/error.js';
-import { configureCloudinary } from './config/cloudinary.js';
+import { connectDB } from './src/config/db.js';
+import { corsAllWithCreds } from './src/config/cors.js';
+import routes from './src/routes/index.js';
+import { notFound, errorHandler } from './src/middleware/error.js';
+import { configureCloudinary } from './src/config/cloudinary.js';
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
