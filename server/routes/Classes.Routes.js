@@ -1,3 +1,4 @@
+// src/routes/classes.routes.js
 import { Router } from 'express';
 import {
   listClasses,
@@ -5,7 +6,7 @@ import {
   createClass,
   updateClass,
   deleteClass
-} from '../controllers/classes.controller.js';
+} from '../controllers/classes.controller.js'; // ✅ .js extension required
 
 const router = Router();
 

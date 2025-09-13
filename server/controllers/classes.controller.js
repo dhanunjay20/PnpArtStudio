@@ -26,22 +26,33 @@ export async function listClasses(req, res, next) {
     if (published === 'false') q.published = false;
     const items = await ClassModel.find(q).sort({ createdAt: -1 });
     return res.json({ items });
-  } catch (e) { return next(e); }
+  } catch (error) {
+    return next(error); // Pass errors to Express error handler
+  }
 }
 
 export async function getClass(req, res, next) {
   try {
     const doc = await ClassModel.findById(req.params.id);
-    if (!doc) return res.status(404).json({ message: 'Not found' });
+    if (!doc) return res.status(404).json({ message: 'Class not found' });
     return res.json(doc);
-  } catch (e) { return next(e); }
+  } catch (error) {
+    return next(error);
+  }
 }
 
 export async function createClass(req, res, next) {
   try {
     const b = req.body || {};
     const errs = validate(b);
-    if (Object.keys(errs).length) return res.status(400).json({ message: 'Validation failed', details: errs });
+    
+    // Return 400 for validation errors (client error)
+    if (Object.keys(errs).length) {
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: errs 
+      });
+    }
 
     const payload = {
       title: String(b.title).trim(),
@@ -58,24 +69,59 @@ export async function createClass(req, res, next) {
 
     const doc = await ClassModel.create(payload);
     return res.status(201).json(doc);
-  } catch (e) { return next(e); }
+  } catch (error) {
+    // Handle Mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = {};
+      for (let field in error.errors) {
+        validationErrors[field] = error.errors[field].message;
+      }
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
+    return next(error);
+  }
 }
 
 export async function updateClass(req, res, next) {
   try {
     const b = req.body || {};
-    // Partial validation: only enforce constraints on provided fields
+    
+    // Partial validation: only validate provided fields
+    const partialData = {
+      ...(b.title !== undefined && { title: b.title }),
+      ...(b.mode !== undefined && { mode: b.mode }),
+      ...(b.startDate !== undefined && { startDate: b.startDate }),
+      ...(b.durationWeeks !== undefined && { durationWeeks: b.durationWeeks }),
+      ...(b.seats !== undefined && { seats: b.seats }),
+      ...(b.price !== undefined && { price: b.price }),
+      ...(b.level !== undefined && { level: b.level }),
+    };
+    
+    // Only validate fields that are being updated
     const errs = validate({
-      title: b.title ?? 'x',
-      mode: b.mode ?? 'Online',
-      startDate: b.startDate ?? '2000-01-01',
-      durationWeeks: b.durationWeeks ?? 1,
-      seats: b.seats ?? 1,
-      price: b.price ?? 0,
-      level: b.level ?? 'Beginner',
+      title: partialData.title || 'placeholder',
+      mode: partialData.mode || 'Online',
+      startDate: partialData.startDate || '2000-01-01',
+      durationWeeks: partialData.durationWeeks || 1,
+      seats: partialData.seats || 1,
+      price: partialData.price !== undefined ? partialData.price : 0,
+      level: partialData.level || 'Beginner',
     });
-    const filtered = Object.fromEntries(Object.entries(errs).filter(([k]) => b[k] !== undefined));
-    if (Object.keys(filtered).length) return res.status(400).json({ message: 'Validation failed', details: filtered });
+    
+    // Filter errors to only include fields being updated
+    const relevantErrors = Object.fromEntries(
+      Object.entries(errs).filter(([key]) => b[key] !== undefined)
+    );
+    
+    if (Object.keys(relevantErrors).length) {
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: relevantErrors 
+      });
+    }
 
     const update = {
       ...(b.title !== undefined && { title: String(b.title).trim() }),
@@ -90,16 +136,36 @@ export async function updateClass(req, res, next) {
       ...(b.published !== undefined && { published: b.published === true || b.published === 'true' }),
     };
 
-    const doc = await ClassModel.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
-    if (!doc) return res.status(404).json({ message: 'Not found' });
+    const doc = await ClassModel.findByIdAndUpdate(
+      req.params.id, 
+      update, 
+      { new: true, runValidators: true }
+    );
+    
+    if (!doc) return res.status(404).json({ message: 'Class not found' });
     return res.json(doc);
-  } catch (e) { return next(e); }
+  } catch (error) {
+    // Handle Mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = {};
+      for (let field in error.errors) {
+        validationErrors[field] = error.errors[field].message;
+      }
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
+    return next(error);
+  }
 }
 
 export async function deleteClass(req, res, next) {
   try {
     const doc = await ClassModel.findByIdAndDelete(req.params.id);
-    if (!doc) return res.status(404).json({ message: 'Not found' });
-    return res.json({ ok: true });
-  } catch (e) { return next(e); }
+    if (!doc) return res.status(404).json({ message: 'Class not found' });
+    return res.json({ success: true, message: 'Class deleted successfully' });
+  } catch (error) {
+    return next(error);
+  }
 }

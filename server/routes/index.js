@@ -1,11 +1,11 @@
-// service/src/routes/index.js
+// src/routes/index.js
 import { Router } from 'express';
-import classesRoutes from './classes.routes.js'
-import galleryRouter from './gallery.routes.js';
-import productsRouter from './products.routes.js';
-import authRouter from './auth.routes.js';
-import couponsRouter from './coupon.routes.js';
-import newsletterRouter from './newsletter.routes.js';
+import classesRoutes from './classes.routes.js'; // ✅ Added .js
+import galleryRouter from './gallery.routes.js';  // ✅ Added .js
+import productsRouter from './products.routes.js'; // ✅ Added .js
+import authRouter from './auth.routes.js';        // ✅ Added .js
+import couponsRouter from './coupon.routes.js';   // ✅ Added .js
+import newsletterRouter from './newsletter.routes.js'; // ✅ Added .js
 
 const routes = Router();
 
